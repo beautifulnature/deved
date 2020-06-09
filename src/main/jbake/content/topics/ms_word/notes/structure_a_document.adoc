@@ -1,0 +1,88 @@
+As highlighted in the discussion of the Word object model on professional documents, a well-thought-out document structure is required for successful, professional documents. 
+This applies both to the content, which must be legible, and to the automatic creation and editing of such a document. 
+The layout and formatting must be carefully prepared and implemented.
+
+Functionality such as style sheets, tables, headers and footers as well as data management are decisive for good document structuring. 
+In this last chapter, we will briefly discuss these topics as part of the Open XML SDK. 
+Now that you are familiar with the basics of working with ZIP packages and the Open XML SDK, we will be less concerned with the details and more in the discussion with the peculiarities in dealing with the functionality. 
+We will also pay great importance to the advantages of LINQ-to-XML when solving tasks.
+
+== Formatting with Styles
+
+Format templates enable uniform, function-related formatting that runs through the entire document. 
+The use of format templates instead of individually assigned formatting reduces the file size of the document. 
+In addition, styles have the advantage that if the formatting is to be changed, changes are only necessary in the definition of a style. 
+It is no longer necessary to search the entire content of several parts of the ZIPPack for individual formatting commands. 
+In the previous chapters you have repeatedly seen that styles are managed separately in the `styles.xml` file. 
+The format template is indicated in the text by an ID value.
+An example in Chapter 24 showed how to read and list the style definitions of a document.
+
+This section takes a closer look at the structure of `styles.xml` and explains how styles are created and assigned to the text in the document.
+
+As with the previous examples, the examples in this section are summarized in a Windows Form solution, as shown in Figure 26.1.
+
+== Headers and Footers
+
+A report or a professional document is often only complete if it has headers and / or footers. 
+We briefly introduce the topic here and show how header and footer parts are created and referenced in document.xml. 
+You will also learn how to handle tab characters and tab stops and how field functions are created.
+
+As usual, the sample code is behind a Windows Form solution (Figure 26.9)
+
+Figure 26.9 The Windows form for the creation of headers and footers
+
+ONLINE: The Visual Basic project OpenXMLSDK_06 as well as the example document Example26_03_1_Resultat.docx can be found in the download archive for the book in the folder Examples/Kap26
+
+The Add Headers & Footers button triggers the btnKopfFusszeilen_Click procedure in Listing 26.6. 
+After opening the target document, the main part of the document is addressed as usual. 
+This is followed by four actions:
+- Existing headers and footers are removed from the document
+- It is ensured that there is a section change at the end of the document and that the header and footer for the first page are different in this section
+- Then the headers and footers are created for the first and for the remaining pages and integrated in document.xml
+- Finally, style sheets for formatting the headers and footers that were just created are added to the document
+
+The first three points are dealt with in the following sections. 
+Since the creation of style sheets was presented in detail in the section “Formatting with style sheets”, the last point only deals with new knowledge.
+
+The created headers and footers contain field functions. 
+The end result is shown in Figure 26.10. 
+The footers on the first and other pages are the same. 
+They contain two field functions, one with the file path and one with the creation date of the document. 
+The first page header is blank; that of the remaining pages contains the page number and the number of all pages.
+
+
+Figure 26.10
+
+
+== Open XML SDK Productivity Tool
+
+After reading this chapter, you may well be wondering how the developer should find out all of these objects and properties ?!
+
+To a certain extent, they can be derived from Word Open XML. 
+The names of the elements or a variation of them often correspond to the object names of the Open XML SDK. 
+Sometimes, however, it is not at all clear what is meant, and a search in the documentation does not help. 
+A very useful tool in such a case is the Reflect Code function of the Open XML SDK Productivity Tool, which is shown in Figure 26.14.
+
+The tool provides code that creates the specified target document (or part of it). 
+The result is very extensive and not optimized, but provides all the objects and properties required that can be looked up in the documentation.
+
+Figure 26.14 Determine objects and properties of the Open XML SDK
+
+== Summary
+
+In this chapter, various aspects of creating a professional document using the Open XML SDK were shown:
+
+- In the section "Formatting with styles" at the beginning of the chapter, the creation of styles and their assignment presented in the text. 
+Part of the discussion was setting standard document settings. 
+- The creation of headers and footers was the topic of the section »Headers and footers«. 
+Among other things, it was shown how
+-- Headers and footers are removed from a document
+-- Section changes can be managed
+-- dealing with field functions
+-- Tab characters inserted and tab stops defined
+- This was followed by information on how tables are created in a document. 
+The following topics were discussed:
+-- Reading data in a character-separated file
+-- Creating the structures of a table and writing content
+-- Formatting and creating a table using a table style
+-- The chapter ended with a brief introduction to the Open XML SDK Productivity Tool

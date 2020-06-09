@@ -1,2 +1,103 @@
 [id='{context}']
 = Chapter 1: VBA basics and Word macros
+
+== Every beginning is difficult
+
+Every task has to start somewhere. 
+This is no different with Word's automation. 
+A simple entry point is difficult to see because Word's object model is comprehensive and powerful. 
+In addition, it is made more difficult for pure VBA developers to carry out all tasks only with VBA code, since some interfaces (see Part C) can only be addressed from the outside.
+
+The diagram in Figure 1.1 shows only the top level of the object model for Word. 
+For a more detailed diagram, go to the Microsoft website at http://msdn2.microsoft.com/en-us/library/bb288731.aspx [Ms472-K01-01]. 
+The changes made to the Word 2010 object model are summarized on the page http://msdn.microsoft.com/en-us/library/ee836186(office.14).aspx [Ms472-K01-02].
+
+Figure 1.1. The top level of the Word object model
+
+The innovations that have found their way into development and the object model with Word 2013 are on the page http://msdn.microsoft.com/de-de/library/office/ff838936.aspx [Ms472-K01-
+03] summarized. 
+This page should also serve you as a contact point, since it is certain that further help and news will be listed or linked here that will only be made available after the publication of this book. The entry page for documentation can be found at http://
+msdn.microsoft.com/de-de/library/fp179696.aspx [Ms472-K01-04].
+Overall, only a few innovations have been added in Word 2013; most related to enhancements to content controls (Chapter 7), tracking changes and comments, and new apps for Office (Chapter 21).
+
+== Programming aids
+
+The macro recorder remains the first entry point for solving a task. 
+However, the problem arises that even in Word 2013 not all actions are recorded by the macro recorder or recorded actions have to be laboriously supplemented with the help of VBA (See the section "Object Model Help - A Hidden Treasure Room" later in this chapter). 
+The cleaned code is then built into the effective macro or procedure.
+
+=== Insert the macro recorder
+
+The macro recorder can be recorded in the ribbon using the command DEVELOPER TOOLS/Code/Macro or by double-clicking the corresponding icon in the status bar (Figure 1.2). 
+So that the DEVELOPER TOOLS tab is visible in the ribbon, this must be shown via FILE/Options/Adjust ribbon.
+
+Figure 1.2. Start symbol for the macro recorder in the status bar and during the recording. 
+In the Record Macro dialog box that now appears (Figure 1.3), assign the macro a meaningful name (is suggested >> Macro n >> where n is a consecutive number). 
+You should also enter a helpful description for quicker identification later. 
+There is also the option of the new macro of a button in the toolbar for quick access (Word 2007 to 2013), the ribbon (Word 2010/2013) or assign a shortcut in the user interface. 
+It is important to set the context from the Save macro in drop-down list box, as this option determines the actual location of the macro. 
+By default, a new macro is inserted in the NewMacros module of the Normal.dotm template. 
+Word can make macros available to the entire environment or only make them available in certain documents or templates. 
+Detailed information on this topic can be found in Chapter 14.
+
+NOTE: If you enter a macro name that already exists in the NewMacros module, Word asks if you want to overwrite the existing macro; check the existing macro before overwriting it, or enter a different macro name if necessary.
+
+Figure 1.3. In addition to the macro name, it is important to specify the location for the macro.
+
+After confirming the Record Macro dialog box (if you have not clicked the toolbar or keyboard), you will return to the document. 
+The Stop recording icon is now displayed in the status bar.
+
+From now on, almost all interactions performed in Word will be recorded in a procedure in the NewMacros code module. The following points should be noted:
+- The display of a dialog box is not recorded, but the end result of the settings made in it. (Example: You display the open dialog box and choose a document. The macro recorder records the opening of this document, but not the opening og the dialog box.). Chapter 15 shows you how to display a dialog box.
+- The macro recorder only recognizes those actions of the user that are carried out within the Word application environment. 
+For example, if you insert an Excel spreadsheet into the Word document, the insertion will probably be recorded. 
+All modifications made in the worksheet are not recorded because they are made in the Excel environment. 
+To learn more about handling inserted objects, please refer to Chapter 12.
+- The change to another application window is also not recorded. 
+A change between Word document windows is recorded if this is done via the VIEW tab or the Windows taskbar. 
+Changes made with (Alt) + (->
+ <-) are not recognized. 
+The automation of other office applications will be discussed in Chapter 11
+- The insertion, marking and formatting of graphics is partly recorded. 
+However, it is not possible to return to the document with a click of the mouse. To do this, press the (Esc) key.
+- You can temporarily stop the macro recorder to carry out a marking or action that cannot be carried out with the keyboard or a menu command (Stop recording button). Click the button again to continue recording.
+
+The Stop recording button ends the recording. 
+Switch to the Visual Basic Editor ((Alt) + (F11)) to view and adjust the result in the NewMacros module.
+
+The macro recorder has a long history: up to and including Word version 95 (7.0), it faithfully recorded user actions in the WordBasic programming language. The result could be used without much change. The Word programming language has been VBA (Visual Basic for Applications) since Word 97. 
+This is designed on an object-oriented basis, which means that the code should address the objects in the application directly instead of reproducing the individual user actions according to the input. 
+This puts the macro recorder in a bind because it only perceives what the user is doing while recording. 
+The individual interactions cannot be abstracted and transferred to the object model in a broader sense. 
+The result of a recording can therefore only be used to a limited extent: the code has to be reworked more or less. 
+In addition, a recorded macro is difficult to manage, since it is difficult to determine directly what the purpose of the code is. 
+The result of a recording can therefore only be used to a limited extent: the code has to be reworked more or less. 
+Unfortunately, the program lines are rarely sufficiently commented on by the manufacturer. 
+If such a macro is "inherited" within a company, it is difficult or impossible to change the needs or changes in the Word environment at a later point in time.
+
+Let us take the recorded procedure in Listing 1.1 as an extreme example. 
+The insertion point was in the first cell of an empty table at the start of the recording. 
+The marking was extended to the right across the entire row (five cells) and this was formatted in bold. 
+Column headings were then entered in each cell of this row. 
+At the end there is the insertion point in the first column of the second line (Figure 1.4). 
+For the recorded macro to work as desired, the user must position the insertion point in the first cell of a table before executing it. 
+Otherwise runtime errors occurs.
+
+Did you really guess this process and the condition when reading the program lines? 
+Maybe, but it would have taken some headaches. 
+In Listing 1.1, the purpose and location of the process are difficult to see.
+
+Figure 1.4
+This is how the table should always look, which is not guaranteed by the recorded macro
+
+Listing 1.1
+The procedure recorded with the macro recorder
+
+
+== Integrate and manage macros in the user interface
+
+== Macro security
+
+== VBA basics
+
+== Summary
