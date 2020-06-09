@@ -1,0 +1,61 @@
+:parent-context: {context}
+
+:context: {parent-context}-notes
+[id='{context}']
+
+*Development Notes*
+
+*Abstract*
+
+Test
+
+
+:folder: ms_word
+:folder_path: topics/{folder}/notes
+
+Part A: Basics of working with VBA
+
+:context: vba_basics-and-word_macros
+include::{folder_path}/{context}.adoc[leveloffset=+1]
+
+:context: windows_APIs_VBA
+include::{folder_path}/{context}.adoc[leveloffset=+1]
+
+:context: word_and_XML
+include::{folder_path}/{context}.adoc[leveloffset=+1]
+
+Part B: The object model in Word
+Chapter 4: Basics of the object model
+Chapter 5: Professional documents
+Chapter 6: Overview of working with objects
+Chapter 7: Word and Data structures
+Chapter 8: Word Events
+Part C: Control and Be controlled
+Chapter 9: Remote control basics
+Chapter 10: Control Word from other environments
+Chapter 11: Control other programs from Word
+Chapter 12: Embeded Objects
+Part D: Optimisation of User Interfaces
+Chapter 13: Application Options
+Chapter 14: Location of Customizations
+Chapter 15: Work with dialog boxes
+Chapter 16: The Office Fluent UI
+Chapter 17: Keyboard Layouts
+Chapter 18: Word Task Areas
+Chapter 19: Override internal Word commands
+Chapter 20: Access to Visual Basic Editor
+Part E: Office Apps
+Chapter 21: Apps for Word
+Part F: Office Open XML
+Chapter 22: Office Open XML: First Steps
+Chapter 23: Word documents and the Open XML SDK
+Chapter 24: Read Open XML document content
+Chapter 25: Edit Open XML document content
+Chapter 26: Structure a document
+Part G: Annexure
+A: Visual Basic & Visual Studio Express
+B: General information about field functions
+C: Word Startup options
+D: In case of problems - Reset Word
+E: Userful internet links
+F: Download archive of the book

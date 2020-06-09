@@ -1,0 +1,14 @@
+// Use this file to define attributes shared by all content in the repo.
+
+:imagesdir: images
+//:toc: left
+:toclevels: 5
+:numbered:
+:sectanchors:
+:sectlinks:
+:sectnums:
+:sectnumlevels: 5
+:ProjectName: My{nbsp}Learnings
+:ProjectNameID: Development
+:ProjectVersion: 0.1
+:experimental:

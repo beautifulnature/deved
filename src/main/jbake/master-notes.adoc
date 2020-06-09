@@ -1,0 +1,9 @@
+include::common_content/attributes.adoc[]
+
+
+// Book Title
+
+= Development Documentation Reference Guide for {ProjectName}
+:context: {ProjectNameID}
+
+include::content/doc_manual-notes.adoc[]
