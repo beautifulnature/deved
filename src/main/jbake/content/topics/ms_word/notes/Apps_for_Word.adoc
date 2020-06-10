@@ -63,3 +63,41 @@ In practice, tools with IntelliSense and debugging functions help enormously.
 These are included in SharePoint 2013 and Visual Studio Professional 2012 (and higher).
 
 In order to be able to perform certain actions, JavaScript requires an internet server, which the software manufacturer (and not Office) has to provide.
+
+If you want to sell and distribute your applications, you must have a digital signature and a seller account (subscription) in the Windows Store.
+
+Everyone has to decide for themselves whether developing apps for Office makes sense for non-professional developers...
+
+In the following sections, we will show you how to create simple apps for Office to give you a little taste.
+
+The best way to find out more about this topic right now is in books on the topic of SharePoint 2013 (for developers) and in the documentation on MSDN.
+
+=== First Steps
+
+As mentioned at the beginning, an app consists of several pure text files of certain vocabularies: primarily HTML5, CSS, XML and JavaScript. 
+In this section we will introduce the various components and explain how they work together. 
+You do not need anything other than an ordinary text editor to familiarize yourself with the new technology.
+
+ONLINE: The sample files Bsp21_1.html and Bps21_1.xml are in the download archive for the book in the folder Examples/Kap21.
+
+=== HTML - The user interface
+
+HTML ensures that the content is displayed in the app task area. 
+It is ordinary HTML code; an app for Office supports the HTML5 version. 
+The page designed for an app can also be opened in a browser window, as shown in Figure 21.1.
+
+Figure 21.1 The HTML code for a task pane, displayed in the browser window
+
+The HTML code for this page is in Listing 21.1. 
+It was typed in an ordinary editor and saved as an HTML file.
+
+NOTE: When using a text editor, remember to set the encoding to UTF-8 when the file is saved for the first time! Otherwise other non-ANSI characters will not be displayed correctly. 
+You can find more about this in Chapter 3.
+
+Listing 21.1 HTML code for a task
+
+The following is important for an app:
+- The DOCTYPE declaration at the beginning, which states that it is an HTML5 document
+- The entries in the section <head>, which provide important information such as the encoding, the required browser compatibility and the path to any supporting files that are to be loaded
+
+NOTE: More detailed information about the tags in the section <head> can be found at http://msdn.microsoft.com/library/office/fp161023.aspx [Ms472-K21-02].
