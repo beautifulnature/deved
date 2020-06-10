@@ -21,6 +21,146 @@ This section takes a closer look at the structure of `styles.xml` and explains h
 
 As with the previous examples, the examples in this section are summarized in a Windows Form solution, as shown in Figure 26.1.
 
+Figure 26.1 The Windows form for working with styles
+
+ONLINE: You can find the Visual Basic project OpenXMLSDK_05 in the download archive for the book in the folder Examples/Kap26.
+
+=== The structure of styles.xml
+
+If you take a closer look at a file for styles (styles.xml) created by Word, you will see three different sections within the root element w:styles:
+
+- The default document settings (w:docDefaults)
+- A list of Word's own styles without style definitions (w:latentStyles)
+- A list of definitions of the styles used in the document (w:style-Elements, each as a direct descendant of the root element)
+
+These three sections are shown in Figure 26.2 and were briefly introduced in Chapter 24 when it was explained how to create a list of the styles in the document.
+
+Figure 26.2 The three sections of styles.xml
+
+This section covers the creation of standard document settings as well as style definitions.
+
+NOTE: The list of latent styles is only relevant if the formatting of the document is to be blocked or the display of the style lists in the task area or in the dialog box is to be adjusted.
+
+=== The default document settings
+
+Have you ever wondered where Word takes language formatting from, which is defined differently from standard, but always occurs in the document text? 
+or what is the origin of a font you have not specified?
+
+These and other settings are recorded in the `w:docDefaults` section of `styles.xml` as paragraph and text properties. 
+In the Word environment, the Set Defaults tab of the Manage Styles dialog box provides access to some of these settings. 
+But the one for the standard spell check language is not among them.
+
+The documents created in Chapter 25 lack these settings because the code does not define them. 
+The only exception is the example in which an existing Word document was imported into the newly created document using the altChunk method.
+In this case there is styles.xml: It was brought with the imported document to support the existing formatting. 
+If the default language setting is missing, Word takes the standard input language set in Windows (Control Panel / Region and Language / Change Keyboards / General). 
+When the document is saved for the first time, this language is written into the document as the default language.
+
+The font settings are taken from the design (theme), if available. 
+If you want to check these document settings, they must be taken into account when creating the document.
+The code in Listing 26.1 builds on sample results from the previous chapter.
+Two file names appear in the first line of code. 
+The first file name indicates the result of the import of a block, while the second (commented out) file name indicates the result of the import process of a Word document. 
+The first document contains neither formatting nor document settings, the second document contains those of the imported document.
+ONLINE: The sample documents example26_01_1.docx and example26_01_2.docx can be found in the download archive for the book in the folder Examples/Kap26.
+
+Figure 26.3 shows how the subsequent setting of the standard settings affects the second example document. 
+The text formatted explicitly with a style retains its formatting, such as the headings, the lists, and the table formatted with a table style; their style sheets were also imported. 
+The rest of the text adopts the document settings specified in Listing 26.1, such as the language (GermanSwitzerland instead of English), the font (Arial Standard instead of Calibri) and the font size (8 instead of 11 points).
+
+NOTE: When integrating an altChunk part, the settings that already exist in the target document are not changed.
+
+Figure 26.3 The impact of document settings on original and imported text
+
+=== The code meeting
+
+As usual, the document to be edited is first opened as a ZIP package. 
+Since the style part (StyleDefinitionsPart, corresponds to styles.xml) is connected to the main document part (MainDocumentPart, corresponds to document.xml) and is reached via it, it is addressed accordingly. 
+Then get the style part with GetPartsOfType (Of StyleDefinitionsPart).
+
+Only if this is not available (equal to Nothing), the sample code continues to run and calls the function DocumentFormat_Fixing, where the format part and its content (with Dim FV as Styles = New Styles, analogous to the creation of the document content) are created.
+
+Listing 26.1 Set the default formatting settings for a document
+
+Before the procedure DocDefaults_Zufuegen is called, which adds the settings to the style part, there is the declaration and the instantiation of an object of the data type EnumValue (Of JustificationValues). 
+This determines the alignment of a paragraph - formatting that should be set as a default setting.
+The WertBoth means justification. 
+In Word Open XML this object corresponds to the element w:jc.
+
+The paraAusrichtungVoll object is passed to DocDefaults_Zufuegen with further settings as parameters. 
+This procedure creates the default settings and assigns them to the style part.
+
+NOTE: Remember that the font size must be doubled and the space between paragraphs must be 20 times.
+
+DocDefaults_Zufuegen makes intensive use of LINQ-to-XML to create the settings. 
+All new settings are nested on a single command line. 
+The settings are instantiated and assigned values using the keywords New and With. 
+Finally, the DocDefaults object (corresponds to the element w:docDefaults with all sub-elements) is assigned to the content of the style part. 
+The resulting XML of the style part is shown in Figure 26.4.
+
+Figure 26.4 The document settings made
+
+NOTE: As in document.xml and in the format definitions, the elements w:pPr and w:rPr also appear here, which record the paragraph and text properties. 
+In the document settings, however, they are surrounded by a w:pPrDefault or a w:rPrDefault element. 
+These correspond in the code Hierarchies ParagraphPropertiesDefault and ParagraphPropertiesBaseStyle or RunPropertiesDefault and RunPropertiesBaseStyle. 
+If you use other classes instead of these, Word and the Open XML SDK will not complain, but the result will not be what you expected (the settings will be ignored and not accepted as the default).
+
+The definition of the font is particularly noteworthy. 
+The class to be used is RunFonts and not fonts. 
+RunFonts corresponds to the element w:rFonts, which accepts multiple attributes.
+The Fonts class refers to the fonts specified in the design, while RunFonts allow the specification of a specific font, as in this example. 
+Again there are attributes for the Latin and the complex fonts; ascii sets the font for Latin characters.
+
+=== Define Styles
+
+In the next example, styles (w:style-Elements) are defined and added to the style part. 
+The results of the previous example are used as a basis for this.
+
+ONLINE: The sample documents example26_01_1_Resultat.docx and example26_01_2_Resultat.docx can be found in the download archive for the book in the folder Examples/Kap26.
+
+Just like when creating a template manually, before you write a line of code, you should list the templates and their formatting. 
+Pay particular attention to inheritance: it saves you a few lines of code and greatly simplifies any subsequent adjustments to the formatting.
+The table in Figure 26.5 illustrates the list that was created for the example. 
+The style specified in the Based-On column indicates that all formatting that has not been explicitly specified is automatically adopted by that style. 
+For example, Heading 1 inherits the language from Standard, but not the font or size.
+
+Figure 26.5 A list of styles to create
+
+Unless otherwise stated, Standard itself takes over the document settings.
+The end result (Figure 26.7) shows the result of these settings: The entire text, except for the headings, now appears in Times New Roman, 12 points, and the language is now German (German).
+In addition, the paragraphs are no longer justified, but left-justified.
+
+=== The Code meeting
+
+The process is initiated in the procedure btnFormatvorlagen_Click of Listing 26.2, which is very similar to that of Listing 26.1. 
+To create the style sheets, FormatTargetPart_Create is called. 
+Several variables are instantiated here, some of them as EnumValue data types. 
+These are passed on to the procedures for the individual styles.
+
+Listing 26.2 The creation of styles in the style part
+
+Each style sheet is created in its own procedure (Listing 26.3), analogous to that for the document settings. 
+However, there are some differences between styles and styles:
+- A style sheet needs:
+-- a name (corresponds to the element w:name)
+-- an ID value (corresponds to the attribute w:styleId of the element w:style)
+-- the specification of the style (paragraph or character) (corresponds to the attribute w: type of the element w: style)
+-- the definition of whether it is a standard style (used by Word if no style is specified for a text run) (corresponds to the w:default attribute of the w:style element)
+
+- For a style, you can also specify
+-- whether it is a self-defined style (the attribute w:custom of the element w:style)
+-- what other style settings it inherits from (the w:basedOn element)
+
+- The Classes StyleParagraphProperties and StyleRunProperties are used to define style sheets to define paragraph and text properties
+
+Listing 26.3 Create a single style
+
+These procedures also use LINQ-to-XML to create the entire set of XML nodes in one code command line.
+
+=== Assign styles to the document text
+
+In the examples in Chapter 25, you saw instructions on style sheets in the document.xml file.
+
 == Headers and Footers
 
 A report or a professional document is often only complete if it has headers and / or footers. 

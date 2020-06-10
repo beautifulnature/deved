@@ -1,0 +1,20 @@
+Historically, the Word application (technically speaking a Word instance) is required to create, print or edit a Word document in it. 
+This applies to both the user and the developer.
+
+But this is becoming an obstacle:
+- Since the Word application was primarily designed for the user, it is more difficult to use it in a server environment. 
+However, more and more services are being performed by server applications, which is increasingly restricting the timeliness and usefulness of conventional Word documents.
+- The programming interfaces are comparatively slow - especially when Word is controlled from the outside; not least because the preview is updated continuously. 
+In addition, the remote control has to work through several COM interfaces, which further slows down the execution.
+- Documents are increasingly no longer archived in paper form, but digitally. 
+The old, proprietary binary file formats are poorly suited for this.
+- And finally, the spirit of the times calls for open standards and files that are not reserved for non-proprietary software. A new file format for core office applications was required.
+
+The result was introduced in Office 2007: Office Open XML. It replaces the previously used binary file formats. 
+This chapter provides an introduction to the structure of Open XML documents and how to use them. 
+Unfortunately, the VBA developer has no tailored tools to work with the new file format. 
+Nevertheless, this chapter is intended to serve as a basis for understanding the new structures.
+
+TIP: Some document damage problems can be solved by manually intervening in the XML files based on the document!
+
+In the next chapter, we present a tool that takes over the structure management described in this chapter, so that the developer can concentrate on working with the document content.

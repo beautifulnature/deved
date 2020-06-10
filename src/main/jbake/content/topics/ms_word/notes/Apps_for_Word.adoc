@@ -1,0 +1,65 @@
+The big news at the developer level for Office 2013 is the introduction of a new technology, the Apps for Office. 
+The office developer naturally wonders what the new technology is and what it means for him. 
+In this chapter we will briefly introduce this technology.
+
+== Overview: what are apps for Office?
+
+Apps for Office are relevant tools for Office applications, the code of which is stored completely independently of Office, mostly in a network or on the Internet.
+
+The user purchases an app for Office either from the Microsoft Office Store or from "catalogs" provided by the IT department. 
+The latter can be part of SharePoint Server or a shared and trusted folder on the network.
+
+Only entries in such trusted sources are offered to the user. 
+They cannot download and install anything "just like that" from the Internet. 
+Apps represent a real improvement from a security perspective.
+
+What apps for Office cannot do is communicate in depth with the Office application, the Office document and the Windows environment. 
+You can only interact with the Office applications to a limited extent. 
+Much of what we are used to when programming the COM interface is not possible with an app. 
+Access to files and the settings on the PC are not released. 
+It is also not possible to control the office application. 
+In principle, an app can only do something with the current document. 
+Depending on the application, different user interfaces are available. 
+With Word, apps only communicate in the form of task areas. 
+The task pane contains a control, which in turn comprises a browser (Internet Explorer) control. 
+The user interface and user interaction take place as on a website via the browser control.
+
+The user chooses the tool he wants, and this appears in Word in a separate task area that the user interface provides.
+
+Word Apps can:
+- Read and write data of the current marker (both as plain text, as a table, as a data field, as an HTML file or as Word Open XML)
+- Connect to content controls for more flexibility
+- Exchange data with a custom XML part
+- Trigger events using connections to display contextual content in the task pane
+
+== What technology are apps for Office based on?
+
+Apps for Office are based on the same technology as they are currently used for internet development and for apps for Windows: a combination of HTML5, CSS, XML and JavaScript.
+
+Completely new APIs were created for the interaction with the Office applications, which are available as JavaScript libraries (i.e. .js files).
+Nothing we have known so far is used in the developer interfaces. 
+One goal of these new APIs is to offer a uniform developer interface for all office applications. 
+Thus, for example, exactly the same methods are used to read and write data in Word or Excel. 
+One of the first questions asked by Office developers is whether apps for Office will replace the conventional technologies for adapting an Office application to a program. 
+Currently, the answer to this is a resounding no, as from the FAQ at http://msdn.microsoft.com/library/office/fp161023.aspx [Ms472-K21-01] and the roadmap.
+
+Apps for Office are intended to complement the expansion options for Office. 
+It should be noted that only apps for Office are available as extension options for the Office Web Apps and the editions that run on Windows RT. 
+Traditional VBA code, VSTO extensions, and automation interfaces are not available in these versions of Office.
+
+Since those environments follow different rules than applications that are installed on a desktop computer, apps for Office have different guidelines regarding security and access.
+
+Only apps for Excel and Outlook work in the web versions of the Office 2013 applications. 
+Word and PowerPoint, which run in a browser environment, do not (yet) support apps.
+
+== Who can develop apps for Office?
+
+The minimum requirement for developing apps for Office is knowledge of HTML5, CSS and JavaScript.
+Depending on the functionality, other internet-related technologies come into play.
+
+In theory, anyone can develop apps for Office. 
+In principle, any text editor is sufficient as a tool. 
+In practice, tools with IntelliSense and debugging functions help enormously.
+These are included in SharePoint 2013 and Visual Studio Professional 2012 (and higher).
+
+In order to be able to perform certain actions, JavaScript requires an internet server, which the software manufacturer (and not Office) has to provide.
