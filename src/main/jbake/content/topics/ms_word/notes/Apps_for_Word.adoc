@@ -101,3 +101,214 @@ The following is important for an app:
 - The entries in the section <head>, which provide important information such as the encoding, the required browser compatibility and the path to any supporting files that are to be loaded
 
 NOTE: More detailed information about the tags in the section <head> can be found at http://msdn.microsoft.com/library/office/fp161023.aspx [Ms472-K21-02].
+
+== XML - The link
+
+The Office application does not load the HTML file directly, but via an XML file - the "manifest" - which provides all the information required for the task area, such as
+- the type of app (a task area), content on the document interface (only for Excel) or extension for Outlook (only possible in connection with Exchange Server)
+- the origin, headings and description of the part
+- in which applications the app may be loaded
+- what permissions the app claims
+
+The manifest of this sample app is shown in Listing 21.2. 
+The individual sections are discussed in the following sections.
+
+Listing 21.2 The Manifest for the Sample App (Bsp21_1.xml)
+
+NOTE: More information about XML for a manifest can be found at http://msdn.microsoft.com/library/office/fp123693.aspx [Ms472-K21-03] and http://msdn.microsoft.com/library/office/fp161044.aspx
+
+== The root element: OfficeApp
+
+As usual with XML files, the root element lists all namespaces to which the XML code refers. 
+It also contains the required type attribute. 
+This is assigned the type of app for Office, which determines where the app appears and how it behaves. 
+There are basically three Types as shown in Table 21.1. 
+Word only supports apps in a task area (TaskPaneApp).
+
+Table 21.1 The different apps for office types
+The app appears in a task area. 
+Supported by Word (desktop only), Excel (desktop and WebApp), PowerPoint (desktop only) and Project (professional, desktop only).
+
+ContentApp The app appears on the document surface, similar to an embedded object. 
+Is currently only supported by Excel.
+
+MailApp The app is integrated in the Outlook user interface. 
+Only supported by Outlook (on the desktop and as a WebApp) in conjunction with Exchange Server.
+
+== General sub-elements
+
+Several sub-elements in the next hierarchy level define properties and settings for the app. 
+These are listed in Table 21.2 and apply to all types of apps. 
+The elements must appear in the order specified in the XML code of the manifest.
+Not all are required.
+
+Table 21.2 Valid sub-elements for the OfficeApp element Element Required Description Id Yes The ID value consists of a GUID (Global Unique Identifier).
+
+Full versions of Visual Studio have a tool to create a GUID. 
+However, this is also possible online at http://www.guidgen.com/ [Ms472-K21-05]. 
+And as an additional alternative, a tool can be downloaded from http://guid.codeplex.com/ [Ms472-K21-06]. 
+This value should be retained when updating an app (new version).
+
+If for any reason two apps should be loaded with the same ID, Office will not load one of them and display an error message.
+
+AlternateId Version ProviderName DefaultLocale No ID value assigned by the Windows Store if the app is distributed through it Yes The version number specified by the manufacturer. 
+Must match the RegEx sample at http://msdn.microsoft.com/library/office/fp123663.aspx [Ms472-K21-07].
+
+Yes Name of the software manufacturer as a string Yes The default language for strings. 
+The information must correspond to the RegEx sample at http://msdn.microsoft.com/library/office/fp123685.aspx [Ms472-K21-08] (it is basically a combination of two or three-digit ISO country codes).
+
+Element
+DisplayName
+Description
+IconUrl
+SupportUrl
+AppDomains
+VersionOverrides
+Required Description
+
+Yes The name the user sees as a short string (up to 125 characters). 
+It is possible to define additional DisplayName elements as "overrides" for additional language areas. 
+More information can be found at http://msdn.microsoft.com/de-de/library/office/fp161083.aspx [Ms472-K21-09].
+Yes Allows a longer description of the app. 
+This setting can also be made available in multiple languages.
+
+
+No Indicates the source from which an icon for the app can be loaded No Indicates where support for the app can be found No Lists the additional domains that the app calls No Contains elements for use in future versions of the App platform when published. These elements can be corrections for previously defined elements or new elements.
+
+== Supported document types: Capabilities
+
+== Settings: DefaultSettings
+
+== Permissions: Permissions
+
+== Load an app in Word
+
+== Share an app
+
+== Trust an app
+
+== Load the app
+
+== CSS: the formatting
+
+== JS: the JavaScript programming interface
+
+== Exchange text between task area and document
+
+== getSelectedDataAsync/ setSelectedDataAsync
+
+== Connect app to document areas
+
+== The example
+
+== Create an app project in Visual Studio
+
+As with VSTO solutions, Visual Studio does some of the repetitive work when creating a new project. 
+Do the following:
+1. Invoke the menu command FILE / New Project to open the dialog box from Figure 21.13
+2. Select the programming language (VB or C #).
+3. Open the Templates/Office/SharePoint folder.
+4. Click the Apps entry and then select the App for Office 2013 entry from the list.
+5. Assign a name to the project (Example 21_04) and define the storage location.
+6. Confirm with OK.
+
+Image 21.13 Create a new app for an office project
+
+The dialog box shown in Figure 21.14 appears, which corresponds to the type of app (the type attribute in the OfficeApp element of the manifest) and the supported applications (corresponds to the Capabilities element in the manifest). 
+Activate this in the example Check Word in the Task Pane App in section (a TaskPaneApp) and click Complete.
+
+Figure 21.5: Project for an Office app created by Visual Studio
+The sample app created by Visual Studio is fully operational and can be used with (F5) in debug mode
+be carried out. 
+The app is signed with a test certificate. 
+This will help made sure that it is trustworthy on the test computer. 
+The Word application is started and loaded the app.
+
+Figure 21.6: The sample app created by Visual Studio
+
+As can be seen in Figure 21.16, the button in the task pane leads to that in the section »Exchange text between task area and document« presented method getSelectedDataAsync.
+
+We won't discuss the code created by Visual Studio here, but rather focus on connecting the apps to areas in the document. 
+A more precise one Viewing the content is well worth it, however, since some common principles work with
+JavaScript are shown.
+
+== Connect to the current marker
+
+Instead of a one-time data exchange with the current marking, a fixed connection should be used be inserted into the document at this point. 
+If the user marks this place and executes the code, the selected text is surrounded by a "plain text" content control.
+
+The app has no way to change the properties of the content control; they can only create the content control and remember: »I can use the connection name, I gave him, exchange data.«
+
+The connection name assigned by an app consists of a combination of letters and long number sequences - nothing that a person can remember well. 
+Therefore there is the possibility set the name for the connection as part of the method. 
+This is called addFromSelectionAsync and the method signature looks like this:
+
+----
+bindingsObj.addFromSelectionAsync(bindingType [, options], callback);
+----
+
+NOTE: For details on the method, see http://msdn.microsoft.com/de-de/library/fp142282.aspx [Ms472-K21-21].
+
+This action comes in the example app with the controls in the upper part of the task area for use (Figure 21.17). To understand this, select the text, type Enter a name in the field and click the Connect app to marker button.
+
+Figure 21.17 Connect to the current marker
+Listing 21.17 Connect to the current marker
+
+The first line of code addresses the input field in the task area, the second reads its content out. 
+The third line of code encounters the `addFromSelectionAsync` method of the Office.context object.
+document.bindings (links in a document). 
+The first parameter expects the Art connection - here as text. 
+It is not necessary to enter a name for the connection.
+If desired, the information is passed as an object (in curly brackets). 
+Mostly an optional callback function is also defined to check whether the connection could be created successfully and perform further actions accordingly.
+
+In the present example, the type of connection and the ID value are shown in the gray message area
+shown in the lower part of the task area (see Figure 21.16).
+
+Notice how this information is provided: the one given to the callback function Object result brings them along. The status property holds whether the method addFromSelectionAsync was successful. 
+Information on possible errors is provided via the The error property is provided and the value returns the created connection object. 
+If the method could not be executed successfully, "undefined" is returned. 
+To get the properties of binding, a corresponding object must be created and created immediately result.value can be set.
+
+After executing this command several times, the document contains several content controls and connections to the app. 
+It would be desirable to see a list of these connections ...
+
+== List existing connections in the document
+
+The bindings object provides the `getAllAsync` method to get a list of everything in the document to create existing connections. 
+The list is displayed as a data field via the callback Function specified object result returned, as shown in Listing 21.8.
+
+A for statement is used to loop through the data field and the ID values ​​of a string added. 
+At the end this is shown in the notification area of ​​the task area, as in Figure 21.18 can be seen.
+
+Listing 21.18 List all connections in the document
+
+Figure 21.18 A list of the connections to the app in the document
+
+== Read the content of a connection
+
+As with markers, it is possible to exchange data with connected areas. 
+The corresponding Methods are called getDataAsynch and setDataAsynch. 
+Your method signatures are:
+
+----
+bindingObj.getDataAsync([, options] , callback );
+bindingObj.setDataAsync(data, [, options] ,callback);
+----
+
+They are similar in operation to the methods for data exchange for markings, only they are executed on a binding object instead of the document object.
+
+Listing 21.9 shows how the content of a connection is read and in the message area the task pane is displayed (Figure 21.19).
+
+Listing 21.9: Read and display the content of a specified connection
+
+== Connect to a RichText content control
+
+== Paste formatted content
+
+So far we have only presented examples with plain text without any formatting. 
+Formatting however, are an important part of Word. 
+An app with formatted content nothing to do would hardly ever become a useful tool for the application.
+
+== Summary
+
