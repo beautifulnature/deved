@@ -17,4 +17,141 @@ Nevertheless, this chapter is intended to serve as a basis for understanding the
 
 TIP: Some document damage problems can be solved by manually intervening in the XML files based on the document!
 
-In the next chapter, we present a tool that takes over the structure management described in this chapter, so that the developer can concentrate on working with the document content.
+In the next chapter, we present a tool that takes over the structure management described in this chapter, so that the developer can concentrate on working with the document content. 
+However, basic knowledge of the structure and interrelationships of the file format are also essential for this.
+
+== The Open XML file format
+
+An Open XML file consists of a ZIP package of numerous XML files that can be created and manipulated using conventional tools. 
+The underlying schemes are publicly accessible and have been approved by the ISO (International Organization for Standardization) and the ECMA as Open Packaging Conventions (OPC) standards.
+
+NOTE:Standardization of file formats
++
+The Open Packaging Conventions (OPC) were originally part of the Office Open XML file formats, which were standardized by the ECMA in 2006 as »ECMA-376«. 
+This standard is also known as »ECMA-376 1st edition (2006)«.
++
+A new version of the standard was approved by the ISO in 2008 as "ISO/IEC-29500:2008". 
+An updated version of the ECMA standard, which was technologically based on the ISO standard, was published as »ECMA-376 2nd edition (2008)«.
++
+A third version of the ECMA standard was published in June 2011, bringing the information in line with the ISO standard for Office 2010.
+
+The four main documents of the ISO standard cover around 7,000 pages. 
+The standard defines »transitional« provisions, so that documents that follow the previous standard are considered valid transitional documents of the ISO standard. 
+It is envisaged that the transitional provisions will be removed later, which would correspond to the strict ISO standard ("Strict").
+
+The Office 2007 and Mac 2008 applications (Word, Excel and PowerPoint) create and recognize documents that meet the standard »ECMA-376 1st edition (2006)«. 
+Office 2010 and Mac 2011 application documents are more in line with the ISO standard. 
+Word 2010 can read "Strict" format documents, but only write the "Transitional" format.
+
+Office 2013 supports reading and writing the »Transitional« format as well as the ISO »Strict« format, which does not include the »Legacy« functionality. 
+You can find more information on this at http://blogs.msdn.com/b/dmahugh/archive?/2010/04/06/office-s-support-for-iso-iec-29500-strict.aspx
+
+In addition to public accessibility, the Open XML file format has other advantages - especially for programmers whose code does not run in the VBA environment (which means that Word can be controlled remotely):
+
+- A Word document can be created and edited in a server environment and without the presence of the Word application. 
+Word documents can even be created and edited on systems on which no Microsoft software is used or Office cannot be run at all, such as Linux/UNIX.
+- The sequence of actions is very fast compared to controlling Word applications using the object model
+- Splitting off the content management from the user interface makes it possible to align the applications and their remote control options more closely with the users and the expansion of the user interface. 
+From the outside, the office applications are increasingly sealed off - which is to be welcomed for security reasons - and withdrawn from the general developer.
+
+NOTE: When a solution based on the Office Open XML format is not optimal? 
+This is the case if it requires functionality that is only provided by the user interface. 
+Examples include converting a file to another file format and updating dynamic content such as field functions (including tables of contents and page numbering). 
+In this case, the document must still be opened and saved in the Word application. 
+For the server environment, the »Word Automation Services« are available, which are part of Microsoft SharePoint from version 2010 (see also http://msdn.microsoft.com/de-de/library/ee558830(v=office.14).aspx [Ms472-K22-02]).
+
+Before you can use Open XML, you need to understand the basics of the file format. 
+Only with this knowledge a meaningful work with the Open XML file format is possible.
+
+Stay open to new things: Working with Office Open XML and the tools developed for it reflect the principles of XML rather than the object-oriented philosophies we are familiar with.
+
+The Word document Bsp22_01.docx serves as the first example for this discussion, the content of which is shown in Figure 22.1.
+
+image::22.1 A Word Document
+
+ONLINE: The example file Bsp22_01.docx is located in the download archive for the book in the \Examples\Kap22 folder.
+
+== The components of an Open XML file
+
+== The gateway to the Open XML file: [Content_Types.xml]
+
+=== What is a content type
+
+== Parts and their naming
+
+=== New terminology
+
+== Relationships between the parts: rels
+
+=== Documentation about relationship types
+
+=== Implicit and explicit relationships
+
+=== Internal and external relationships
+
+=== Allowed relationships
+
+=== New terminology
+
+== Practical application: replace a part
+
+=== Programming environments for working with Office Open XML
+
+=== Online resources for Office Open XML
+
+An overview of the file format in German can be found in Wikipedia: http://de.wikipedia.org/wiki/Office_Open_XML [Ms472-K22-07].
+
+However, most documentation sources are in the English language. 
+Below is an overview.
+
+*ISO-Standard*
+
+The main documents for the ISO/IEC 29500:2008 standard are available at http://standards.iso.org/ittf/PubliclyAvailableStandards/index.html [Ms472-K22-08]. 
+These are reference works for all aspects of Office Open XML. 
+The ISO/IEC 29500:2008 standard documents include four main documents with appendices, as follows:
+- The ISO/IEC 29500:2008 standard documents include four main documents with appendices, as follows:
+
+Contains definitions of conformity and reference material, including XML schemas for the XML document markup languages. 
+This part comprises more than 5,500 pages.
+
+- Part 2 (Open Packaging Convention)
+
+(As presented in this section.) Describes the OPC, core properties, and other package-related items, such as handling digital signatures and miniatures. 
+It provides the XML schemas for the OPC. 
+This part has more than 1,000 pages.
+
+- Part 3 (Markup Compatibility and Extensibility)
+
+Describes the expansion options and comprises approximately 40 pages.
+
+- Part 4 (Transitional Migration Features)
+
+Describes parts from previous versions that are still supported for backward compatibility, such as VML (Vector Markup Language, two-dimensional graphics). 
+It lists the differences between »ISO/IEC 29500: 2008« and »ECMA-376 1st edition«.
+
+Where is the right entry point so that you don't lose track of so much information? 
+For starters, the first part is the most important. 
+We recommend “Section 8 - Overview” of ISO/IEC 29500-1 “Fundamentals and Markup Language Reference” as an introduction.
+
+Afterwards, it makes sense to skim over the table of contents of the four main documents and to keep an eye out for the topics that are relevant to the task at hand.
+
+Although this documentation may seem overwhelming at first, it contains extensive explanatory texts and helpful examples.
+
+==== additional Information
+
+The document `Primer.docx`, which is part of »ECMA-376 1st Edition Part 3«, offers a good introduction to the topic of Office Open XML. 
+It can be downloaded as a Word document or PDF file from http://www.ecma-international.org/publications/standards/Ecma-376.htm [Ms472-K22-09].
+
+The namespaces and schemas are fully listed, with information and examples, at http://www.schemacentral.com/sc/ooxml/s-wml.xsd.html [Ms472-K22-13]. 
+Information, documentation, examples and discussion forums can be found on OpenXMLDeveloper.org.
+
+Information for various programming languages such as Java, C++, Linux and Mac can also be called up here.
+
+==== Forums
+
+The forums on OpenXMLDeveloper.org cover many topics and programming languages. 
+These are used by numerous Open XML developers. 
+The MSDN's English-language forums include the Open XML SDK forum, which specializes in this tool: http://social.msdn.microsoft.com/Forums/office/en-us/home?forum=oxmlsdk [Ms472-K22-14]. 
+There is also a forum for the Microsoft implementations of the Open XML file formats: http://social.msdn.microsoft.com/Forums/en-us/home?forum=os_openXMLecma [Ms472-K22-15].
+
+== Summary

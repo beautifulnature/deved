@@ -72,7 +72,7 @@ In the following sections, we will show you how to create simple apps for Office
 
 The best way to find out more about this topic right now is in books on the topic of SharePoint 2013 (for developers) and in the documentation on MSDN.
 
-=== First Steps
+== First Steps
 
 As mentioned at the beginning, an app consists of several pure text files of certain vocabularies: primarily HTML5, CSS, XML and JavaScript. 
 In this section we will introduce the various components and explain how they work together. 
@@ -96,13 +96,26 @@ You can find more about this in Chapter 3.
 
 Listing 21.1 HTML code for a task
 
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    </head>
+    <body>
+        <p>Meine erste <b>App für Word</b>.</p>
+    </body>
+</html>
+----
+
 The following is important for an app:
 - The DOCTYPE declaration at the beginning, which states that it is an HTML5 document
 - The entries in the section <head>, which provide important information such as the encoding, the required browser compatibility and the path to any supporting files that are to be loaded
 
 NOTE: More detailed information about the tags in the section <head> can be found at http://msdn.microsoft.com/library/office/fp161023.aspx [Ms472-K21-02].
 
-== XML - The link
+=== XML - The link
 
 The Office application does not load the HTML file directly, but via an XML file - the "manifest" - which provides all the information required for the task area, such as
 - the type of app (a task area), content on the document interface (only for Excel) or extension for Outlook (only possible in connection with Exchange Server)
@@ -115,9 +128,35 @@ The individual sections are discussed in the following sections.
 
 Listing 21.2 The Manifest for the Sample App (Bsp21_1.xml)
 
+----
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:type="TaskPaneApp">
+    <Id>d54a3fe4-7012-4a19-924f-4e2bcdf9796d</Id>
+    <Version>1.0</Version>
+    <ProviderName>Word Programmierung-Handbuch</ProviderName>
+    <DefaultLocale>DE-DE</DefaultLocale>
+    <DisplayName DefaultValue="Meine erste App"/>
+    <Description DefaultValue="Meine erste App für Word."/>
+    <IconUrl DefaultValue=    "http://officeimg.vo.msecnd.net/_layouts/images/general/office_logo.jpg"/>
+    
+    <Capabilities>
+        <Capability Name="Document"/>
+        <Capability Name="Workbook"/>
+    </Capabilities>
+    
+    <DefaultSettings>
+        <SourceLocation DefaultValue="File:///C:/Beispiele/Kap21/Bsp21_1.html"/>
+    </DefaultSettings>
+    
+    <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
+----
+
 NOTE: More information about XML for a manifest can be found at http://msdn.microsoft.com/library/office/fp123693.aspx [Ms472-K21-03] and http://msdn.microsoft.com/library/office/fp161044.aspx
 
-== The root element: OfficeApp
+==== The root element: OfficeApp
 
 As usual with XML files, the root element lists all namespaces to which the XML code refers. 
 It also contains the required type attribute. 
@@ -125,83 +164,667 @@ This is assigned the type of app for Office, which determines where the app appe
 There are basically three Types as shown in Table 21.1. 
 Word only supports apps in a task area (TaskPaneApp).
 
-Table 21.1 The different apps for office types
-The app appears in a task area. 
+.21.1 The different apps for office types
+[cols=2*]
+|===
+|TaskPaneApp
+|The app appears in a task area.
 Supported by Word (desktop only), Excel (desktop and WebApp), PowerPoint (desktop only) and Project (professional, desktop only).
-
-ContentApp The app appears on the document surface, similar to an embedded object. 
+|ContentApp
+|The app appears on the document surface, similar to an embedded object. 
 Is currently only supported by Excel.
-
-MailApp The app is integrated in the Outlook user interface. 
+|MailApp
+|The app is integrated in the Outlook user interface. 
 Only supported by Outlook (on the desktop and as a WebApp) in conjunction with Exchange Server.
+|===
 
-== General sub-elements
+==== General sub-elements
 
 Several sub-elements in the next hierarchy level define properties and settings for the app. 
 These are listed in Table 21.2 and apply to all types of apps. 
 The elements must appear in the order specified in the XML code of the manifest.
 Not all are required.
 
-Table 21.2 Valid sub-elements for the OfficeApp element Element Required Description Id Yes The ID value consists of a GUID (Global Unique Identifier).
+.21.2 Valid sub-elements for the OfficeApp
+[%header, cols=3*]
+|===
+|Element
+|Required
+|Description
 
-Full versions of Visual Studio have a tool to create a GUID. 
+|Id
+|Yes
+|The ID value consists of a GUID (Global Unique Identifier). 
+The Full versions of Visual Studio have a tool to
+to create a GUID. 
 However, this is also possible online at http://www.guidgen.com/ [Ms472-K21-05]. 
-And as an additional alternative, a tool can be downloaded from http://guid.codeplex.com/ [Ms472-K21-06]. 
+And as an additional alternative, a tool can be downloaded from http://guid.codeplex.com/ [Ms472-K21-06].
+
 This value should be retained when updating an app (new version).
 
 If for any reason two apps should be loaded with the same ID, Office will not load one of them and display an error message.
 
-AlternateId Version ProviderName DefaultLocale No ID value assigned by the Windows Store if the app is distributed through it Yes The version number specified by the manufacturer. 
+|AlernateId
+|No
+|ID value assigned by the Windows Store if the app is distributed through it.
+
+|Version
+|Yes
+|The version number specified by the manufacturer. 
 Must match the RegEx sample at http://msdn.microsoft.com/library/office/fp123663.aspx [Ms472-K21-07].
 
-Yes Name of the software manufacturer as a string Yes The default language for strings. 
+|ProviderName
+|Yes
+|Name of the software manufacturer as a string.
+
+|DefaultLocale
+|Yes
+|The default language for strings.
 The information must correspond to the RegEx sample at http://msdn.microsoft.com/library/office/fp123685.aspx [Ms472-K21-08] (it is basically a combination of two or three-digit ISO country codes).
 
-Element
-DisplayName
-Description
-IconUrl
-SupportUrl
-AppDomains
-VersionOverrides
-Required Description
-
-Yes The name the user sees as a short string (up to 125 characters). 
+|DisplayName
+|Yes
+|The name the user sees as a short string (up to 125 characters). 
 It is possible to define additional DisplayName elements as "overrides" for additional language areas. 
 More information can be found at http://msdn.microsoft.com/de-de/library/office/fp161083.aspx [Ms472-K21-09].
-Yes Allows a longer description of the app. 
+
+|Description
+|Yes
+|Allows a longer description of the app. 
 This setting can also be made available in multiple languages.
 
+|IconUrl
+|No
+|Indicates the source from which an icon for the app can be loaded.
 
-No Indicates the source from which an icon for the app can be loaded No Indicates where support for the app can be found No Lists the additional domains that the app calls No Contains elements for use in future versions of the App platform when published. These elements can be corrections for previously defined elements or new elements.
+|SupportUrl
+|No
+|Indicates where support for the app can be found.
 
-== Supported document types: Capabilities
+|AppDomains
+|No
+|Lists the additional domains that the app calls.
 
-== Settings: DefaultSettings
+|VersionOverrides
+|No
+|Contains elements for use in future versions of the App platform when published. 
+These elements can be corrections for previously defined elements or new elements.
+|===
 
-== Permissions: Permissions
+==== Supported document types: Capabilities
+
+Every type of app requires specific properties and settings. 
+These appear in the XML code after the general elements. 
+Which these are is determined by the assignment to the type attribute in the root element (section »The root element: OfficeApp«).
+
+The required capabilities element is expected from all app types. 
+It includes one or more capability sub-elements. 
+Each capability element specifies a file type (office application) on the basis of which the app can be loaded. 
+You can limit an app for a task area (TaskPaneApp) to a single application such as Word, or you can also share it with Excel, PowerPoint and Project, or any combination of the four.
+----
+<Capabilities>
+    <Capability Name="Document"/>
+    <Capability Name="Workbook"/>
+    <Capability Name="Presentation"/>
+    <Capability Name="Project"/>
+</Capabilities>
+----
+
+==== Settings: DefaultSettings
+The default settings of an app are listed under the `DefaultSettings` element. 
+Again, each type of app has its own set of elements. 
+For a `TaskPaneApp` there is (currently) only the required `SourceLocation` element, which records the path as a URL to the files for the app.
+
+==== Permissions: Permissions
+Finally, for a `TaskPaneApp`, the permissions claimed by the app are set in the Permissions element. 
+These determine how the app works with the office application (see Table 21.3).
+
+.21.3 The possible permissions for a TaskPaneApp
+[%header, cols=2*]
+|===
+|Value
+|Description
+
+|Restricted
+|Permission that applies to all apps for the task area, enables activation and allows the use of the `Settings`-Object API, which enables settings to be saved in the document.
+
+|ReadDocument
+|Contains the `Restricted` permission and allows the app for the task area to use Method `getSelectedDataAsync` to read from the document
+
+|ReadAllDocument
+|Contains `Restricted` and `ReadDocument` permissions and allows the app for the task pane to use the `getFileAsync` method to get a copy of the full document.
+
+|WriteDocument
+|Contains the `Restricted` permission and allows the app for the task pane to use the Method `setSelectedDataAsync` to write to the document
+
+|ReadWriteDocument
+|Contains the `ReadAllDocument` and `WriteDocument` permissions and allows the app to use all writing methods for the task area, manage bindings and subscribe to events.
+|===
+
+Now that you have the necessary background information, it's time to learn how to load an app into Word.
 
 == Load an app in Word
 
+The two necessary components are ready: The app can be loaded into Word (or Excel) for the first time, as shown in Figure 21.2.
+
+image::21.2.The app in the task area[]
+
+An app is called up via the button Apps for Office in INSERT/Apps. 
+If an app has never been loaded, the list is still empty (Figure 21.3).
+
+image::21.3 No app for Office has been loaded into the application
+
+Via Show all you get to a dialog box in which all available apps are listed on the My apps tab. 
+Alternatively, you can search for apps using the Find more apps in the Office Store link and download them from the store. 
+The connection to the store is established for the respective country (if the store is available for this specific region), in this case for Germany.
+
+IMPORTANT: Many apps are specific to a particular language area and may not work correctly in the user interface of another language.
+
+The second tab, Recommended Apps, shows a selection from the store (Figure 21.4)
+
+image::21.4 Recommended apps from the office store[]
+
+It is striking that the dialog box does not provide a button that enables the user to search for an app locally. 
+This is wanted; Apps have to be trusted and approved.
+
 == Share an app
 
-== Trust an app
+Office 2013 applications expect to find the manifest of an app on a secured website (HTTPS) or in a shared folder on the local network.
+The latter can also be a folder on the local computer.
 
-== Load the app
 
-== CSS: the formatting
+To share a folder, do the following:
+1. Navigate to the corresponding folder in Explorer, right-click on it and select the command Share with / specific persons in the context menu.
+2. Select Everyone from the drop-down list and click Add.
+3. Open the dropdown menu in the Authorization level column and select the Read/Write entry.
+
+image::21.5 Share folders for deploying an Office app
+4. Confirm the release by clicking the button of the same name.
+5. After a short time, the message "The folder has been released" appears. 
+Below is a text in which the word "copy" appears as a hyperlink (underlined). 
+Click on the link to copy the path to the folder to the clipboard.
+6. Confirm the message by clicking Done. 
+If you have to copy this path again at a later time, carry out steps 1 and 4 to 6 again.
+
+==== Trust an app
+
+If the path or the URL to the manifest is available, the app for Office can be included in the app catalog. 
+To do this, proceed as follows:
+
+1. Open the Trust Center dialog box via FILE/Options/Trust Center/Settings for the Trust Center and in it the category `Trusted App Catalogs`.
+2. In the Catalog URL field, enter the URL of the shared folder. 
+If you have copied the information to the clipboard, click in the text field and press the key combination (Ctrl) + (V). 
+Everything except the path must be removed from the inserted text (see the entry in Figure 21.6).
+3. Click the Add Catalog button. 
+The path or the URL to the manifest is then listed.
+4. Select the Show in menu check box.
+5. Confirm with OK. 
+In the confirmation that appears, you are also advised that the settings will only be applied after the Office application has been restarted. 
+Only then the app is actually available.
+
+image::21.6 The path to the manifest must be entered as trustworthy[]
+
+NOTE: If an app can be loaded by several office applications, it is sufficient to enter the app as trusted once. 
+It is then available to all applications with the "capabilities" specified in the manifest.
+
+The Show in menu check box can only be activated for one folder, although several may appear in the list.
+
+==== Load the app
+
+After Word restarts, a third tab called Shared Folders appears in the Apps for Office dialog box (Figure 21.7). 
+This contains an entry for the sample app. 
+Select it first and then click Paste to bring up the task pane in Word (Figure 21.2).
+
+image::21.7 The app is available for the office applications (reduced view)
+
+=== CSS: the formatting
+
+In the early years of the Internet, HTML files contained pretty much everything that belonged to the website. 
+It contained not only the content, but also all formatting commands and code.
+
+Although this is possible for small websites, the person (or people) responsible for the website quickly loses the overview from a certain size and complexity. 
+It is therefore a proven method to outsource code and formatting details to separate files. 
+Hyperlinks to these files can be found in the <head> Element of the HTML file.
+
+The next step is therefore the use of cascading style sheets (.css files) for formatting. 
+
+The technology Cascading Style Sheets, CSS for short, was developed for formatting commands. 
+An example of this can be seen at the beginning of Listing 21.3. 
+The code provides the formatting for our second example.
+
+ONLINE: The sample files Bsp21_2.html, Bsp21_2.xml and Bsp21_2.css are located in the download archive for the book in the folder Examples/Kap21.
+
+It stipulates that
+- Hyperlinks appear underlined when the mouse pointer is over them
+- Text in headings, links and paragraphs appear in one of the listed fonts and in the specified color (dark gray)
+- The `strong`-formatting not only appears bold, but also in red
+
+.Listing 21.3 Contents of the .css, .html and .xml files for the second example
+[source, html]
+----
+</* CSS-file Content /*>
+body {
+    position:relative;
+}
+li : hover {
+    text-decoration: underline;
+    cursor:pointer;
+}
+h1, h3, h4, p, a, li {
+    font-family: "Segoe UI Light","Segoe UI",Tahoma,sans-serif;
+    text-decoration-color:#4ec724;
+}
+strong {
+    color: red;
+}
+
+</* HTML-File content /*>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+        <link rel="stylesheet" type="text/css" href="Bsp21_2.css"
+    </head>
+    <body>
+        <p>Meine zweite <strong>App für Word</strong>.</p>
+    </body>
+</html>
+
+</* XML-File Content /*>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:type="TaskPaneApp">
+    <Id>969f7c9b-9520-4db3-bbc8-e16fe7cbddc5</Id>
+    <Version>1.0</Version>
+    <ProviderName>Word Programmierung-Handbuch</ProviderName>
+    <DefaultLocale>DE-DE</DefaultLocale>
+    <DisplayName DefaultValue="Meine zweite App"/>
+    <Description DefaultValue="Meine zweite App für Word 2013."/>
+    <IconUrl DefaultValue="http://officeimg.vo.msecnd.net/_layouts/images/general/office_logo.jpg"/>
+
+    <Capabilities>
+        <Capability Name="Document"/>
+        <Capability Name="Workbook"/>
+    </Capabilities>
+
+    <DefaultSettings>
+        <SourceLocation DefaultValue="File:///C:/Beispiele/Kap21/Bsp21_2.html"/>
+    </DefaultSettings>
+    <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
+----
+
+The HTML code is in the middle of the listing. 
+It is basically identical to the code from the first example. 
+But note the new entry in the section <head> which includes the `.css` file.
+
+<link rel="stylesheet" type="text/css" href="Bsp21_2.css"
+
+The XML code of the manifest is in the bottom third. 
+There are also adjustments here. 
+If both examples are to run side by side, the value for the element Id and the file name must be adjusted.
+
+Changing the content for `DisplayName` and `Description` is not absolutely necessary, but makes sense.
+
+NOTE: If both apps are saved in the same folder, there is no need to trust the second: everything that is saved in the folder is considered trustworthy.
+
+The second app is shown in Figure 21.8.
+
+image::The second app with the formatting outsourced in a `.css` file
+
+The first steps have been taken: you know what an app consists of and how it is made available to the user. 
+All well and good, but not particularly useful. 
+If you want the app to do something, you need code, JavaScript.
 
 == JS: the JavaScript programming interface
 
-== Exchange text between task area and document
+Actually, it seems a bit strange to present code in four programming languages (five if we include XML) in a book on a single topic - Word programming. 
+As authors, we think a little wistfully of writing colleagues who write books about a programming language and therefore only need to know one! 
+In the past, only WordBasic was relevant for Word. 
+How times have changed in twenty years...
 
-== getSelectedDataAsync/ setSelectedDataAsync
+But we are in the present and now the developer world has discovered Word as an interesting application. 
+Microsoft wants to make it accessible to as many users as possible, so it must be accessible to many programming languages.
 
-== Connect app to document areas
+As with VBA, C#, VB and XML, it is not possible to present the JavaScript programming language in depth on these pages. 
+There are countless books on the market and lots of information on the Internet. 
+The problem, however, is that these are definitely not dealing with JavaScriptAPIs for Office, but only provide general knowledge of the programming language. 
+Our goal is to show how a `.js` file is built for an app for Word and how you can use it to communicate with the Word application. 
+You should then be able to implement the information available in MSDN.
 
-== The example
+NOTE: You can find more about Office's own JavaScript APIs and their use in developing apps on the following websites:
+- http://msdn.microsoft.com/library/office/jj220067.aspx [Ms472-K21-10]
+- http://msdn.microsoft.com/library/office/fp123509.aspx [Ms472-K21-11]
+- http://msdn.microsoft.com/library/fp142230.aspx [Ms472-K21-12]
+- http://msdn.microsoft.com/library/office/dn423225.aspx [Ms472-K21-13]
+- http://msdn.microsoft.com/library/office/fp123511.aspx [Ms472-K21-14]
+- http://msdn.microsoft.com/de-de/library/office/fp161083.aspx [Ms472-K21-15]
+- http://msdn.microsoft.com/de-de/magazine/dn166930.aspx [Ms472-K21-16]
+- http://msdn.microsoft.com/de-de/magazine/jj891051.aspx [Ms472-K21-17]
+- http://msdn.microsoft.com/library/office/fp142185.aspx [Ms472-K21-18]
+- http://blogs.msdn.com/b/officeapps/archive/2013/09/11/learn-how-to-write-apps-for-officecode-interactively-with-the-api-tutorial-for-office.aspx [Ms472-K21-19]
+- http://msdn.microsoft.com/library/office/fp123513.aspx [Ms472-K21-20]
 
-== Create an app project in Visual Studio
+==== Exchange text between task area and document
+
+At the moment, the main story of an app for Word is to write content into a document or to read from a document. 
+This is done in the simplest way via the current marking.
+
+In order to demonstrate this functionality, the HTML code of the sample app was supplemented by a button and a text field, as can be seen in Figure 21.9. 
+The customized HTML code is in Listing 21.4.
+
+image::21.9 An app that exchanges text content with a document
+
+ONLINE: The sample files Bsp21_3.html, Bps21_3.xml, Bsp21_3.css, Bsp21_3.js and the example document Bsp21_03.docx shown in the illustration are in the download archive for the book in the folder Examples/Kap21.
+
+In addition to those that came along <div>-, <button>- and <input>- Elements for the interaction are two new entries in the section</button> <head>. 
+These <script> elements integrate the JavaScript API for Office and the JavaScript code file for the example into the website for the task area.
+
+.Listing 21.4 The supplemented HTML code
+----
+//html-file
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+        <link rel="stylesheet" type="text/css" href="Bsp21_3.css">
+        <script src="https://appsforoffice.microsoft.com/lib/1.0/hosted/office.js" type="text/javascript"></script>
+        <script src="Bsp21_3.js"></script>
+    </head>
+    <body>
+        <H1>Meine dritte App für Word.</H1>
+        <div id="anleitung" >
+            <p>Anleitung: Auf die Schaltfläche klicken, um den im Dokument markierten Text anzuzeigen.</p>
+        </div>
+        <button name="btn" onClick="lesenInhalt()">Markierten Text lesen</button>
+        <p><input type="text" id="inputText" value=""></p>
+    </body>
+</html>
+----
+
+If you select text in the document and then click the button, the content of the selection appears in the text field. 
+At the same time, the instructions and the labeling of the button change, as shown in Figure 21.10.
+
+image::The selected text appears in the text field[]
+
+Click somewhere else in the document and change the text in the text box. 
+If you then click the button again, the content of the text field appears in the document. 
+The instructions and the label on the button are reset to their original state (Figure 21.11).
+
+Figure 21.11 Write text from a text box in the task area of the document[]
+
+The code in Listing 21.5 does this.
+
+NOTE: Notes on JavaScript
+For those readers who are new to JavaScript or C#, the code will likely seem strange. 
+Here are a few brief explanations to make it easier to read:
+- JavaScript (like XML and C#) is case sensitive
+- Comments are given with two slashes: //
+- At the end of each command line there must be a semicolon (;), but not at the end of other lines!
+- A line of code does not have to be entirely on one line, it may wrap over several lines. 
+The semicolon indicates the end of the line of code, not the line break.
+- Curly brackets{} indicate the beginning and end of code blocks and must be in pairs. 
+There is no "End Sub", "End If", "Next" etc. as in the VB languages.
+- A single equal sign assigns a value to a variable: =
+- Two equal signs are used for a comparison, for an if statement, for example: ==
+- Comparisons for if and similar statements are in parentheses: ()
+- Index values for data fields are in square brackets instead of round brackets: []
+
+The first line of code that initializes the Office environment is mandatory for every app for Office and must come first. 
+Here, an anonymous function is executed with a parameter (reason) that returns information about the initialization.
+
+This function controls whether and when the Document Object Model (DOM) is available for the website. 
+In this context, document points to the HTML document that executes the code.
+
+Everything that follows this block of code carries out the actions described in the task area and in the Word document.
+
+Four variables hold the strings for the instructions and the labeling of the button in the task area.
+
+As can be seen from the HTML code in Listing 21.4, clicking the button triggers the function read content. 
+This forms the central point of the JavaScript code.
+
+First, the button and text field are recorded as objects. 
+These are addressed from the HTML document with the methods `getElementsByTagName` and `getElementById`. `getElementsByTagName` returns all elements of the same type (in this case button) as a data field. 
+We only want the first, which is why we specify the array element [0].
+`getElementById` looks up the ID value of an element and returns the element.
+
+.Listing 21.5 The JavaScript code for the app
+----
+// Die Funktion initialize muss zwingend bei allen Apps vorhanden sein.
+Office.initialize = function (reason) {
+// Die jQuery-Funktion ready kontrolliert das Laden des DOM.
+$(document).ready(function () {
+// Nach dem Laden des DOM kann App-spezifischer Code ausgeführt werden.
+// Initialisierungslogik als Teil dieser Funktion zufügen.
+});
+}
+var anleitung1 = "Anleitung: Auf die Schaltfläche klicken, um den im Dokument
+markierten Text anzuzeigen.";
+var anleitung2 = "Anleitung: Auf die Schaltfläche klicken, um den Text ins
+Dokument zu schreiben.";
+var caption1 = "Markierten Text lesen";
+var caption2 = "Text in die Markierung im Dokument schreiben";
+function lesenInhalt() {
+var btn = document.getElementsByTagName("button")[0];
+var fld = document.getElementById("inputText");
+//Dokumentinhalt lesen.
+if (btn.innerText == caption1){
+Office.context.document.getSelectedDataAsync("text", function (result) {
+if (result.status == "succeeded"){
+fld.value = result.value;
+}
+else{
+fld.value = result.error.name + ":" + err.message;
+}
+buttonCaption(caption2);
+anleitungsTextFestlegen(anleitung2);
+})
+}
+//Inhalt ins Dokument schreiben.
+else{
+Office.context.document.setSelectedDataAsync(fld.value, { coercionType: 'text' });
+buttonCaption(caption1);
+anleitungsTextFestlegen(anleitung1);
+}
+}
+function anleitungsTextFestlegen(inhalt) {
+var s = document.getElementById("anleitung");
+s.innerHTML = "<p>" + inhalt + "</p>";
+}
+function buttonCaption(caption){
+var btn = document.getElementsByTagName("button")[0];
+btn.innerText = caption;
+}
+----
+
+An if statement follows, which checks the label of the button. 
+If it is equal to the value of the caption1 variable, the content of the current selection in the Word document is read using the JavaScript for Office method `VegetSelectedDataAsync`. 
+If the method is successful, this value is written in the text field. 
+Otherwise an error message will appear there. 
+Then the label of the button and the instructions are changed.
+
+If the caption corresponds to the caption2 button, the content of the text field is written into the Word document using the Method `setSelectedDataAsync` at the position of the insertion point or marking. 
+In this case too, the labeling and the instructions are adapted.
+
+==== getSelectedDataAsync/ setSelectedDataAsync
+
+The methods `getSelectedDataAsync` and `setSelectedDataAsync` read information from the document or write information into the document. 
+They work with the current marker and are supported by Word, Excel, PowerPoint and Project.
+
+The `getSelectedDataAsync` method signature is:
+----
+Office.context.document.getSelectedDataAsync(coercionType [, options], callback);
+----
+
+.Office.context.document
+----
+You will need the ొOffice.context.documentొ namespace for pretty much anything that does an action with a Word document. 
+Office represents the instance of the apps; the object model is defined in the `Office.js` source code (if you take a closer look at Listing 21.4, you will find one in the HTML code <script>-Link to Office.js ):
+- context: Addresses the runtime environment of the app. 
+This enables you to determine which language is currently being used.
+- document: Refers to the document in which the app was integrated when it was inserted. 
+All methods are provided to work with the document.
+----
+
+Not all Office applications work with the same types of information, which is why the first parameter coercionType specifies the data format in which the read content should be returned. 
+A member of the `Office.CoercionType` enumeration from Table 21.4 is expected. 
+As you can see, Word supports most data types, followed by Excel.
+
+The unnecessary `options` parameter is not relevant for us at this moment.
+
+The third parameter callback enables the execution of another function as soon as the asynchronous execution of `getSelectedDataAsync` has been completed. 
+The `result` parameter enables you to check whether the `getSelectedDataAsync` execution was successful, as the sample code demonstrates. 
+It provides properties for a possible error message as well as the status of the execution and further information.
+
+NOTE: A closer look reveals that the callback function is nested within the `getSelectedDataAsync` method!
+
+.21.4 Members of the `Office.CoercionType` enumeration
+[%header, cols=3*]
+|====
+|Enumeration
+|Value
+|Description
+
+|Office.CoercionType.Html
+|"html"
+|Returns data as HTML or sets it as HTML.
+
+Word only.
+
+|Office.CoercionType.Matrix
+|"matrix"
+|Returns data in tabular form without headers or sets it accordingly. 
+Data is returned or set as an array with one-dimensional strings. 
+For example, three rows of string values in two columns would be represented as follows: [["R1C1", "R1C2"], ["R2C1", "R2C2"], ["R3C1", "R3C2"]].
+
+Word and Excel only.
+
+|Office.CoercionType.Ooxml
+|"ooxml"
+|Returns data as Office Open XML or sets it as Office Open XML.
+
+Word only.
+
+|Office.CoercionType.Table
+|"table"
+|Returns data in tabular form with optional headers or sets it accordingly. 
+Data is returned or set as an array of arrays with optional headers.
+
+Word and Excel only
+
+|Office.CoercionType.Text
+|"text"
+|Data is returned or specified as text (string).
+
+Data is returned or specified as a one-dimensional string.
+|====
+
+The method signature of `setSelectedDataAsync` is:
++
+----
+Office.context.document.setSelectedDataAsync(data [, options], callback);
+----
+
+It also supports the same data formats. 
+The first parameter data transfers the content to the document. 
+The corresponding data format is specified in the unnecessary options as `Office.CoercionType` value. 
+The third parameter callback works like the parameter of the same name of the`getSelectedDataAsync` method. 
+For completeness, Listing 21.6 contains the contents of the CSS file and the manifest file for this example.
+
+.Listing 21.6 CSS file and manifest for the third example
+----
+//CSS-File
+body{
+    position:relative;
+}
+li:hover{
+    text-decoration: underline;
+    cursor:pointer;
+}
+h1,h3,h4{
+    font-family: "Segoe UI Light","Segoe UI",Tahoma,sans-serif;
+    text-decoration-color: black;
+}
+p,a,li{
+    font-family: "Segoe UI Light","Segoe UI",Tahoma,sans-serif;
+    text-decoration-color:#4ec724;
+}
+strong{
+    color: red;
+}
+//XML-Manifest
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:type="TaskPaneApp">
+    <Id>14720137-ab33-4e29-980e-4a4210698b98</Id>
+    <Version>1.0</Version>
+    <ProviderName>Word Programmierung-Handbuch</ProviderName>
+    <DefaultLocale>DE-DE</DefaultLocale>
+    <DisplayName DefaultValue="Meine dritte App"/>
+    <Description DefaultValue="Meine dritte App für Word 2013."/>
+    <IconUrl DefaultValue="http://officeimg.vo.msecnd.net/_layouts/images/general/office_logo.jpg"/>
+    
+    <Capabilities>
+        <Capability Name="Document"/>
+    </Capabilities>
+    
+    <DefaultSettings>
+        <SourceLocation DefaultValue="File:///C:/Beispiele/Kap21/Bsp21_3.html"/>
+    </DefaultSettings>
+    
+    <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
+----
+
+=== Connect APP to document areas
+
+In this section we will look at the ability to connect an app for Word to specific areas in the document so that data can be exchanged regardless of the current marking. 
+In the section "Exchanging text between the task pane and the document" in this chapter, you learned how to exchange data with the current selection.
+
+This procedure is desirable if the user wants to have content from the app inserted at any point or wants to transfer content to the app for further processing. 
+However, one of the main tasks of Word is to create and edit professional documents. 
+These are often structured, and an intrusive task of an app would be to support the user in this activity. 
+Content controls are designed to work with structured documents. 
+As a result, it makes sense that an app for Word can communicate with it directly without the user having to create or constantly highlight content controls.
+
+It is also desirable to display contextual content for the current highlight in the task pane. 
+Therefore, connections provide some events that are triggered on actions with related areas.
+
+For this reason, an app inserted in a document can insert and maintain fixed links to content controls.
+These connections must first be created by a user. 
+When you save the document, they become an integral part of the document and are therefore also available for future editing processes. 
+Such preparation can be compared to equipping a document with bookmarks or mail merge fields for data exchange.
+
+This time the code is created in Visual Studio 2012. 
+The developer who works with the Professional version or higher has a template available for creating apps for Office, which, among other things, offers IntelliSense for code entry and the option for interactive debugging. 
+Such apps are designed for distribution on the Internet (Office Store). 
+However, it is entirely possible to use the code files in a shared folder after adjusting the path information in the HTML and XML files described in the »First Steps« section. 
+In any case, the code presented here also works if it is entered in a text editor.
+
+==== The example
+
+This example provides an introduction to working with connections in apps for Word. 
+It illustrates the following topics:
+- The creation of a fixed link to the current marker
+- The list of all connections to the app available in the document
+- Reading the content of a connection
+- Connect existing RichText content controls to the app
+- Writing formatted text to a RichText content control ("Insert Formatted Content" section)
+
+Figure 21.12 shows the sample app and a related document that illustrates the topics. 
+The sample app is based on the app created by Visual Studio.
+
+ONLINE: The example project Bsp21_04 with all HTML, XML, CSS and JavaScript files is in the download archive for the book in the folder Examples/Kap21. 
+You will also find a version of the example document Bsp21_04.docx shown in Figure 21.12, which is not yet connected to the example app. 
+In addition, in the subfolder Examples/Kap21/Home, all necessary .html, .css and .js files are available, except for the manifest Bsp21_04.xml, which is located in the Kap21 folder, around the app outside the Visual Studio environment view, edit and test.
+
+image::21.12 Sample document and sample app to illustrate connections to areas
+
+==== Create an app project in Visual Studio
 
 As with VSTO solutions, Visual Studio does some of the repetitive work when creating a new project. 
 Do the following:
@@ -232,7 +855,7 @@ We won't discuss the code created by Visual Studio here, but rather focus on con
 A more precise one Viewing the content is well worth it, however, since some common principles work with
 JavaScript are shown.
 
-== Connect to the current marker
+==== Connect to the current marker
 
 Instead of a one-time data exchange with the current marking, a fixed connection should be used be inserted into the document at this point. 
 If the user marks this place and executes the code, the selected text is surrounded by a "plain text" content control.
@@ -273,7 +896,7 @@ To get the properties of binding, a corresponding object must be created and cre
 After executing this command several times, the document contains several content controls and connections to the app. 
 It would be desirable to see a list of these connections ...
 
-== List existing connections in the document
+==== List existing connections in the document
 
 The bindings object provides the `getAllAsync` method to get a list of everything in the document to create existing connections. 
 The list is displayed as a data field via the callback Function specified object result returned, as shown in Listing 21.8.
@@ -285,7 +908,7 @@ Listing 21.18 List all connections in the document
 
 Figure 21.18 A list of the connections to the app in the document
 
-== Read the content of a connection
+==== Read the content of a connection
 
 As with markers, it is possible to exchange data with connected areas. 
 The corresponding Methods are called getDataAsynch and setDataAsynch. 
@@ -302,13 +925,137 @@ Listing 21.9 shows how the content of a connection is read and in the message ar
 
 Listing 21.9: Read and display the content of a specified connection
 
-== Connect to a RichText content control
+==== Connect to a RichText content control
 
-== Paste formatted content
+If the app is already available when creating a structured document, the way of working described above is efficient enough. 
+It could be a bit tedious if an app is linked to an existing document that has already been structured with content control elements. 
+How can they be connected to the app without having to remove it? And if they had to be removed, what happens to any existing connections to Custom XML Parts?
+
+Fortunately, such considerations are superfluous: an app can be connected to existing RichText content controls, using the method `addFromNamedItemAsync`, as shown in Listing 21.10. 
+Your method signature is:
+
+----
+Office.context.document.bindings.addFromNamedItemAsync(itemName, bindingType [, options], callback);
+----
+
+At the top, a global variable is declared and the initial value `0` is assigned. 
+This provides a counter to ensure that the names for the connections are unique but legible for humans.
+
+The `contentRangeRichText` function is triggered when the Read RichText content control button is clicked. 
+As is common in this example, the content of the text box in the task pane is addressed, but this time to determine the title of the RichText content control. 
+Variables for the binding object and its content are also declared here.
+
+`AddFromNamedItemAsync` expects the name of the content control and the type of connection as parameters. 
+The ID value of the new connection may optionally be passed as an object. 
+Here, too, it is possible to define a callback function in order to then work with the return value.
+
+If the method was executed successfully, the counter is incremented by the value "1". 
+The value property of the parameters of the callback function returns the new connection object binding. 
+This then calls `getDataAsync`, whose `result.value` contains the content of the RichText content control. 
+This is displayed in the notification area of the task area (see Figure 21.20).
+
+Listing 21.10 Connect to the RichText content control and view its content
+----
+var bindingCounter = 0;
+function inhaltBereichRichText() {
+    
+    var input = document.getElementById('inputRichTextName');
+    var bindingName = input.value;
+    var bindingInhalt = "";
+    var binding = new Object();
+    
+    Office.context.document.bindings.addFromNamedItemAsync(bindingName, Office.BindingType.Text, 
+            { id: 'RT' + bindingCounter }, function (result) {
+                if (result.status == Office.AsyncResultStatus.Succeeded) {
+                    bindingCounter++;
+                    binding = result.value;
+                    binding.getDataAsync(function (result) {
+                        if (result.status == Office.AsyncResultStatus.Succeeded) {
+                            bindingInhalt = result.value;
+                            app.showNotification("Inhalt des neuen Binding " + binding.id + ": ", bindingInhalt);
+                        } else {
+                            app.showNotification('Fehler:', result.error.message);
+                        }
+                    })
+                } else {
+                    app.showNotification('Fehler:', result.error.message);
+                }
+            });
+}
+----
+
+image::21.20 Connect to the RichText content control and view its content
+
+=== Paste formatted content
 
 So far we have only presented examples with plain text without any formatting. 
 Formatting however, are an important part of Word. 
 An app with formatted content nothing to do would hardly ever become a useful tool for the application.
 
+In addition to plain text, an app for Word also supports HTML and Word Open XML formats. 
+The latter is very complex and is beyond the scope of this chapter. 
+Therefore, below is a brief example with HTML according to Figure 21.21.
+
+image::21.21 Write HTML code in a RichText content control
+
+The HTML code is typed into the text field of the task area, then the button Write the HTML is pressed. 
+The contentHTML function in Listing 21.11 is triggered. 
+As usual, the content of the text field is adopted.
+
+This example assumes that there is a connection called RT1 to a RichText content control. 
+The `getByIdAsync` method is used to address the connection to the content control. 
+If the action is successful, the binding object is set equal to the `result.value`.
+
+The `setDataAsync` method is then executed. 
+It receives the string with the HTML code from the task area as a parameter. 
+The type of data (this time 'html') is also passed as an object.
+
+There is also a callback function to check whether the action was successful.
+
+.Lisiting 21.11 Write HTML-code in a RichText content control
+----
+function inhaltHTML() {
+
+    var input = document.getElementById('inputHTML');
+    var htmlContent = input.value;
+    var bindingName = "RT1";
+    var binding = new Object();
+    
+    Office.context.document.bindings.getByIdAsync(bindingName, function (asyncResult) {
+        if (asyncResult.status == Office.AsyncResultStatus.Failed) {
+            app.showNotification('Ausführung fehlgeschlagen. Fehler: ', asyncResult.error.message);
+        }else {
+            binding = asyncResult.value;
+            binding.setDataAsync(htmlContent, { coercionType: 'html' }, function (result) {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    app.showNotification("Daten wurden geschrieben.", "")
+                } else {
+                    app.showNotification('Fehler:', result.error.message);
+                }
+            });
+        }
+    });
+}
+----
+
 == Summary
 
+The aim of this chapter was to give an introduction to the new technology »Apps for Office«. 
+In this short overview, it was understandably not possible to give a deeper insight into all the capabilities of the apps. 
+For example, we did not go into details on working with data fields, tables, or events. 
+If necessary, you can find information on this in the documentation on MSDN.
+
+At the beginning of this chapter you learned what apps for Office are. 
+A brief description of the technology behind it followed, and you have learned who it is aimed at.
+
+The »First Steps« section gave you an insight into the inner world of technology. 
+Some parts of an app for Word were presented in the sections »HTML - The User Interface«, »XML - The Link« and »CSS: The Formatting«.
+
+Then it was explained how an app is loaded in Word. 
+
+Code pages in the JavaScript programming language formed the content of the section "JS: the JavaScript programming interface". 
+Using several examples, some of the technology's abilities were demonstrated, such as
+- Data is read and written
+- Apps are linked to areas (content controls) in the document
+- Apps for Office projects can be created in Visual Studio 2012
+- formatted text is written into the document

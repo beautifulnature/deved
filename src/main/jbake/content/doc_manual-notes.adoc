@@ -44,8 +44,12 @@ Chapter 17: Keyboard Layouts
 Chapter 18: Word Task Areas
 Chapter 19: Override internal Word commands
 Chapter 20: Access to Visual Basic Editor
-Part E: Office Apps
-Chapter 21: Apps for Word
+
+*Part E: Office Apps*
+*Chapter 21: Apps for Word*
+:context: apps_for_word
+include::{folder_path}/{context}.adoc[leveloffset=+1]
+
 Part F: Office Open XML
 Chapter 22: Office Open XML: First Steps
 Chapter 23: Word documents and the Open XML SDK
