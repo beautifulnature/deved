@@ -73,15 +73,243 @@ ONLINE: The example file Bsp22_01.docx is located in the download archive for th
 
 == The components of an Open XML file
 
+First we will look at the structure and components of a Word Open XML file. 
+You can convince yourself of the accessibility of the Open XML file format without having a developer interface at hand. 
+Open Windows Explorer, navigate to the sample file Bsp22_01.docx and mark the entry.
+
+NOTE: Files of the new file format are clearly recognizable by the file extension, because they consist of four characters: docx, docm, dotx, dotm. 
+The file has the extension .doc or .dot, there is a file in the old, binary format that cannot be viewed without the Word application.
+
+Press the (F2) key, move the insertion point behind the file extension and enter .zip as the new file extension (see Figure 22.2). 
+Complete the entry with the kbd:[Enter] and confirm the Windows security prompt with OK.
+
+The file is then displayed as a ZIP folder in Windows Explorer and can be treated like a normal folder. 
+For example, you can browse through its subfolders to see how the Open XML file is structured.
+
+The structure of the example file Bsp22_01.docx is shown in Figure 22.2. 
+At the top level are the three folders _rels, docProps and word and the file [Content_Types].xml.
+
+image::22.2 An extract of the content of a Word document, saved as a ZIP file[]
+
+The word folder contains among other things the files document.xml and styles.xml. 
+It is also striking that one folder _rels is on the top level and one in the word sub-folder.
+
+NOTE: The folder structure of a ZIP package is purely virtual and is done for administrative reasons. 
+The various parts (files) are grouped hierarchically. 
+The relationships between the parts record the .rels files (see also the explanations in the section »Relationships between the parts: rels«).
+
+The XML code of the sample document contained in the XML file `document.xml` (Figure 22.1) is shown in Figure 22.3. 
+For a better overview, the file is open in Microsoft Visual Studio Express; Windows will open them in Internet Explorer by default.
+
+image::22.3 The XML code of a simple Word document[]
+
+NOTE: If you are familiar with the HTML markup language, some element names such as "body" and "p" will appear familiar to you. 
+This is not surprising, since in both cases the description of "documents" is concerned: Microsoft used known terminology of the same meaning when defining the Word document structures.
+
+And how can you tell that we are dealing with Word Open XML and not with HTML or another markup language? 
+The name prefix w: and the associated namespace for wordprocessingml suggest this.
+
+The content of the XML file shows that not all information for the document is stored in this one XML file: The definitions of the formatting are not listed, for example; there is only a reference <w:pStyle w:val="FormatVorlage1" /> before the text of the second paragraph. 
+Since the standard formatting is done by the Standard style, it is not listed by name for the first paragraph.
+
+Indeed, the information for an Open XML file is finely structured to ensure optimal content management and the smallest possible file size. 
+To keep the file size as small as possible, Word has managed repetitive information centrally and separately from the text, even in the old file formats. 
+At that time we only had no insight into the file structure...
+
+NOTE: This is in contrast to the original Word 2003 XML file format: WordProcessingML. 
+This was a single XML file that contained all of the information underlying the document, rather than a ZIP package with multiple XML files. 
+The Word 2003 version of WordProcessingML has some things in common with the definitions of the namespace http://schemas.openxmlformats.org/wordprocessingml/2006/main of Word Open XML - but they are not exactly identical. 
+If you already have a good knowledge of WordProcessingML, this is an advantage, but you need to be careful.
+
+The `styles.xml` file contains the definitions of all styles.
+
+How the files `document.xml` and `styles.xml` are connected is explained in the course of the following discussion in the section »Relationships between the parts: rels«.
+
+On the one hand, it is important to understand the file structure for creating and editing Word documents. 
+On the other hand, you also need to know how the application works, because only then you can understand the connections. 
+The knowledge gained through the use of Word and its object model definitely pays off when dealing with the Open XML file format!
+
 == The gateway to the Open XML file: [Content_Types.xml]
+
+As can be seen in Figure 22.2, each ZIP package for an Office Open XML document contains a top-level XML file called [Content_Types].xml. 
+This file is required and the name is given.
+
+NOTE: For the reader who works exclusively with the Office Open XML SDK, a superficial understanding of this section content is sufficient. 
+The tool takes over all the administrative work associated with [Content_Types].xml.
+
+The content of this file is a list of the types of content in the ZIP package; the file content of the sample document is shown in Listing 22.1. 
+Each file that is stored in the ZIP package must correspond to one of the types of content listed here, whereby the developer can also define and enter his own in order to integrate his own "third-party" content in the ZIP package. 
+All other types of content are ignored by the Office applications, but are available to other applications.
+
+.Listing 22.1 The content types (Content_Types) of the sample document
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Default Extension="xml" ContentType="application/xml"/>
+
+    <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformatsofficedocument.wordprocessingml.document.main+xml"/>
+    <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformatsofficedocument.
+    wordprocessingml.styles+xml"/>
+    <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformatsofficedocument.
+    wordprocessingml.settings+xml"/>
+    <Override PartName="/word/webSettings.xml" ContentType="application/vnd.openxmlformatsofficedocument.
+    wordprocessingml.webSettings+xml"/>
+    <Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformatsofficedocument.
+    wordprocessingml.fontTable+xml"/>
+    <Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformatsofficedocument.theme+xml"/>
+    <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.coreproperties+xml"/>
+    <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extendedproperties+xml"/>
+</Types>
+----
+
+The sub-elements of the top-level `Types` element have either the name `Default` or the name `Override`.
+
+The default elements define the standard content types (indicated by the attribute `ContentType`) and their file extensions (attribute `Extension`), such as `xml` for files that provide the content of an application document (`application/xml`).
+
+After the default entries, there are six override elements in the sample file that point to recognizable parts of the sample document, including the `document.xml` and `styles.xml` files. 
+These can easily be found using the values of the `PartName` attribute in Listing 22.1. 
+The value of this attribute is a URI and is like a path. 
+If you compare the values with the folder structure in Figure 22.2, you can see that this URI refers to the folder structure.
+
+The second attribute, ContentType, also defines the content type of the respective part in the override element. This instruction in an override element tells the Office application that although the file extension is, for example, xml, it is a different type of content than the standard one. 
+The application that opens a document knows how to deal with a content type, although different applications might handle the content type differently.
+
+IMPORTANT: Each Office application searches for the specific content type in the `[Content_Types].xml` file. 
+If this is not available, the application will not open the document. 
+The content type for an Excel workbook is `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml; for a PowerPoint presentation `application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml`; and for a Word document `application/vnd.openxmlformats-officedocument..wordprocessingml.main+xml`.
 
 === What is a content type
 
+When working with Office Open XML, the question soon arises where the URIs for the ContentType entries come from and how they can be found.
+
+Wikipedia provides a first answer at http://de.wikipedia.org/wiki/Internet_Media_Type [Ms472-K22-03]; the English version at http://en.wikipedia.org/wiki/Internet_media_type [Ms472-K22-04] provides more detailed information. 
+The article describes the common, open standard for defining content types in Internet traffic; Office Open XML uses this standard.
+
+The first segment of all URIs in Listing 22.1 is "application". 
+This term indicates that each part of this type of content provides information for an application. 
+The following designation "vnd" stands for "vendor" (as much as provider) and indicates that it is a type of content for a software manufacturer's application. 
+In this case, the other information in the URI comes from the manufacturer and tells its application what type of content is to be expected.
+
+The URI `application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml` is therefore the instruction for the content type of a document in the vocabulary WordProcessingML for an Office document of the file format Office Open XML. 
+The application (Word) thus knows that such parts can be expected in the ZIP package and that one of these parts is in the path `\word`.
+
+When opening an Open XML file, Microsoft Office applications look for such entries to ensure that it is a file for this application. 
+For example, Internet Explorer recognizes that a `.docx` file in Word and an `.xlsx` file in Excel.
+
+Anyone working with the Open XML SDK presented in a following chapter does not need to know how to deal with content types in detail. 
+However, developers who use other tools to work with Open XML documents do. 
+The SDK does this work for us.
+
+Of course, this raises the question of where the developer can find a list of the types of content? 
+Unfortunately, the documentation does not provide a clear list of all types of content. 
+They are scattered in the documents for the ECMA standard and the information for the office implementation of this standard. 
+The most basic types of content can be found in Part 1 (Fundamentals and Markup Language Reference) of the ISO/IEC 29500:2008 standard documents. 
+Extended content types are also available in the "[MS-OI29500]: Office Implementation Information for ISO/IEC 29500 Standard Compliance".
+
+ONLINE: We have summarized information from these sources in the Excel workbook `OpenXML_Types.xlsx`, which is available in the download archive for the book in the `\Supplements\Kap22` folder.
+
 == Parts and their naming
+
+The term "part" represents a file stored in the ZIP package. 
+An Office Open XML file consists of a ZIP package with several parts, which are arranged hierarchically. 
+In the present example, `document.xml` and `styles.xml` form parts of the ZIP package `Bsp22_01.docx`. 
+The Office applications name the individual parts of a ZIP package that represents a document of the application with names according to a certain pattern: 
+For example, the XML file for a Word document always has the name `document.xml`, that for an Excel file Name `workbook.xml`.
+
+The developer may give individual parts different names than those used by Office. 
+The Office document remains valid and can be opened by the target application. 
+The decisive factor is the content type assigned in `[Content_Types].xml`, not the name.
+
+IMPORTANT: Please note the following: It is not enough to simply give the part a different name. 
+The entries for the content type in `_rels/.rels` and in `[Content_Types].xml` must also be adjusted accordingly. 
+Otherwise the Office application considers the document damaged and cannot open it.
+
+However, it is possible for the Office application to save the file names in the ZIP package when the document is saved again.
+
+This should always be kept in mind during programming: you cannot rely on the file name! Parts must be found using content types and relationship types, which are described in more detail in the following section.
+
+NOTE: Parts play an important role when dealing with Open XML documents. 
+However, anyone who works with the Open XML SDK does not have to worry about their naming, since the tool generalizes this information. 
+However, when working with documents that were not created by Microsoft Word, a confrontation with unknown naming of parts cannot be excluded. 
+So you should be aware of this possibility.
 
 === New terminology
 
+Most of the documentation sources for Open XML are in English. 
+The following is a comparison of the terminology in both languages.
+
+.22.1 New terminology of the section »The gateway to the Open XML file: [Content_Types.xml]«
+[%header, cols=3*]
+|===
+|German Term
+|English Term
+|Short Description
+
+|ZIP-Paket
+|Zip package
+|A collection of files that are stored in a ZIP file according to the ZIP standard
+
+|Inhaltsart
+|ContentType
+|The type of content of a file included in the ZIP package
+
+|Teil
+|Part
+|A file included in the ZIP package
+|===
+
 == Relationships between the parts: rels
+
+Although the entry file `[Content_Types].xml` contains "path details" in the form of URIs that point to files in the ZIP package, these are not used by the Office application to address individual parts. 
+Several parts can be of the same content type without being listed individually in `[Content_Types].xml`. 
+The actual relationships (relationships) between the individual parts of a ZIP package are managed by `.rels` files, which are located in several `_rels` subfolders (a subfolder for each folder with files that maintain relationships).
+
+NOTE: The Open XML SDK developer does not have to master every detail of managing relationships. 
+However, a good understanding of the concepts in this section is a prerequisite for successful application. 
+Relationships provide the necessary information for the hierarchical structure of a document. 
+The individual parts with which the code is to work can only be addressed via them.
+
+As mentioned in the section "Parts and their naming", it cannot be assumed that a certain part always has the same file name. 
+A part should not be found using the file name.
+
+Image::22.4 The content of a ZIP package is shown as ramifications
+
+Most developers are used to working with object-oriented models and going through hierarchies of listings and their objects when an object cannot be clearly addressed using an index value. 
+For example, it is done with file folders and files if you want to use the Dir command to drag through folders.
+
+This procedure would not be particularly efficient for the creation and management of Open XML documents. 
+Although the contents of a ZIP package are usually displayed graphically in a folder structure with subfolders and files, these folders do not really exist. 
+The content could just as well be represented as a branching of nodes, as can be seen in Figure 22.4.
+
+It would be desirable to be able to address files that are to be worked with directly. 
+This would require a system that enables a direct connection to every node, similar to working with XPath. 
+Exactly this service is fulfilled by the entries in the `.rels` files, which are always located in a `_rels` folder on a hierarchical level.
+
+The starting point for researching the content of an Open XML document is the `.rels` file in the `_rels` folder of the first hierarchical level, the content of which is shown in Listing 22.2 for the sample document.
+
+A `.rels` file contains a Relationships element with multiple relationship sub-elements. 
+Each of these sub-elements has the three attributes `Target`, `Type` and `Id`. 
+The value of the attribute `Id` uniquely identifies a part within the hierarchy level. 
+`Type` identifies the type of the relationship. 
+`Target` provides the path specification (the URI) to the file of the relationship type.
+
+.Listign 22.2 The contents of the top-level `.rels` file
+----
+<?xml version="1.0" encoding="UTF-8" standalone="true"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Target="docProps/app.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extendedproperties"
+        Id="rId3"/>
+    <Relationship Target="docProps/core.xml"
+        Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/coreproperties"
+        Id="rId2"/>
+    <Relationship Target="word/document.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
+        Id="rId1"/>
+</Relationships>
+----
 
 === Documentation about relationship types
 
