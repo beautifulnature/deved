@@ -560,7 +560,63 @@ For example, the logo as well as the fonts and possibly also the colors that can
 This process is partly taken into account with the »designs« functionality. 
 However, it often happens that the document templates for letterheads and other document types have to be dapted. This work can be extremely tedious, even if macros are used to support it.
 
+An alternative to opening the document templates in Word and making manual or program adjustments is to exchange the corresponding parts in the ZIP package. 
+This procedure can also be carried out manually or programmatically. 
+In the following we describe the manual process. 
+The example file `Bsp22_04.dotx` contains the new versions of the logo and the format templates. 
+These are copied and pasted into `Bsp22_03.dotx` after the files of the same name have been removed from the ZIP package.
+
+1. Rename the document template to `Bsp22_04.dotx.zip` and then open this ZIP file.
+2. Navigate to the `/word/dokument.xml` file and double-click on it to display the content. 
+So far we haven't considered the representation of graphic elements - the topic is quite complex. 
+The logo is an inserted `.jpg` file that is at the beginning of the document. 
+An excerpt from this part of the XML is shown in Figure 22.10.
+
+image:A portion of the XML code for an inserted graphic object in a Word document
+
+3. Find the value in the `word/_rels/document.xml.rels` file. 
+There you can see that the »Target«, the graphic file `image1.jpg`, is in the subfolder `media`:
+----
+<Relationship Target="media/image1.jpg"
+    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+    Id="rId4"/>
+----
+4. Change to this subfolder. 
+In this example, it only contains the graphic file `image1.jpg`.
+5. Select the media folder and drag it to the desktop while holding the right mouse button. 
+Then be sure to select the Copy Here command from the context menu that appears.
+NOTE: If the last file is removed from a folder, the folder is also deleted. 
+Therefore, in this case, the entire folder must be copied to the desktop for insertion in the target document.
+6. Copy the `/word/styles.xml` file to the desktop as described.
+7. Rename the second document template to `Bsp22_03.dotx.zip` and open this ZIP file in Windows Explorer as well.
+8. Delete the entry `/word/styles.xml` and drag the file of the same name from the desktop into the ZIP package.
+9. Do the same with the `word/media` subfolder by dragging it into the ZIP file and then deleting it on the desktop.
+10. Rename the two document templates again by removing the file extension `.zip`. 
+Then open both document templates in Word, you will find that both look identical.
+
+NOTE: The described action for the logo only works satisfactorily if the new and the old version are the same size. 
+If this is not the case, these settings would have to be adjusted in document.xml.
+
+In the next chapter we will see how the same actions are performed programmatically with the Open XML SDK.
+
 === Programming environments for working with Office Open XML
+
+In principle, any programming environment can create and edit Office Open XML documents. 
+The prerequisite is that it has tools for working with ZIP packages and XML.
+
+VBA is unfortunately left out, since neither libraries for working with XML or ZIP packages are available here. 
+While a version of the MSXML parser library can be integrated, Windows offers no such option for dealing with ZIP packages.
+
+The developer would have to locate a third-party tool and may also need to purchase a license that allows distribution to user computers.
+
+NOTE: Some conventional public libraries allow partial handling of ZIP packages. 
+However, these solutions are not always robust and cannot fully exploit the possibilities of the technology. 
+More information is available at http://www.jkp-ads.com/Articles/Excel2007FileFormat02.asp [Ms472-K22-05].
+
+The DotNetZip tool is available for free download at http://dotnetzip.codeplex.com/ [Ms472-K22-06]. 
+It can be used by COM programming languages such as VBA as well as by .NET languages.
+
+In the following chapter we offer an introduction to the Microsoft Open XML SDK, which is available for download free of charge and can also be used with a free Express version of Visual Studio.
 
 === Online resources for Office Open XML
 
@@ -620,3 +676,20 @@ The MSDN's English-language forums include the Open XML SDK forum, which special
 There is also a forum for the Microsoft implementations of the Open XML file formats: http://social.msdn.microsoft.com/Forums/en-us/home?forum=os_openXMLecma [Ms472-K22-15].
 
 == Summary
+
+This chapter introduced the basics of the Office Open XML file format. 
+This knowledge forms the basis for the manual and program handling of Office Open XML documents. 
+The general accessibility of the document format was shown and the following topics were dealt with:
+
+- In the first section, the reasons for the introduction of the new file format were explained and the public standards briefly introduced
+- This was followed by an insight into the components of an Office Open XML ZIP package using Windows Explorer
+- These findings were deepened in the following section, starting with a discussion on the subject of content types in the `[Custom_Types].xml` file
+- In the next section, the concept of parts was introduced
+- The discussion continued with a discussion of the topic of relationships. 
+Relationships are the key to the successful programming of Open Office XML files.
+- The chapter closes with a simple, practical example that shows the usefulness of the Open Office XML file format
+
+If we look at the components of the Office document, the organization of the individual XML files (parts) forms the "skeleton" and their content the "muscles" that give the document form and function. 
+The "tendons" that connect the individual parts to each other represent the relationships. 
+The "heart" of an Open XML document is `[Custom_Types].xml` and its content types: they describe what type of document it is and how that "Brain", the office application, has to deal with it.
+In the following chapter we offer an introduction to programming work with Open XML documents.

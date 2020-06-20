@@ -1,0 +1,9 @@
+
+
+== The base XML code of a Word document
+
+== Read the XML content of a document
+
+=== An Example
+
+=== How it works

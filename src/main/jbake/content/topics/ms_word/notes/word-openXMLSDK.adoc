@@ -1,0 +1,45 @@
+
+
+== Briefly introduced the Open XML SDK
+
+=== The Open XML SDK Productivity Tool
+
+=== Install the Open XML SDK
+
+== Change the content of document parts
+
+=== Example
+
+=== How it works
+
+=== The Zip package
+
+=== Address parts
+
+=== Address the document content
+
+=== Find an image file
+
+=== The last steps
+
+=== Write the contents of one part in another
+
+== Import new parts and change document type
+
+=== The task
+
+=== How it works
+
+=== Check the document type
+
+=== The ribbon and VBA project parts
+
+=== Change the document type
+
+=== Check whether a part already exists in a ZIP package
+
+=== Create new parts in a ZIP package
+
+=== Adjust the file extension
+
+== Summary
