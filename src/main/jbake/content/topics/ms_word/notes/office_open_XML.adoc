@@ -311,17 +311,254 @@ The value of the attribute `Id` uniquely identifies a part within the hierarchy 
 </Relationships>
 ----
 
+If you want to work with the document, a relationship of the type http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument is searched for in the top level of the ZIP package. 
+If such a relationship exists, the file can be accessed directly via the path (URI) specified in Target - in this case `word/document.xml` - without having to search for it in all hierarchy levels.
+
+The XML code of the document is now available, as shown in Figure 22.3. 
+We are interested in formatting the second paragraph. 
+The Word Open XML code for this can be seen again in Listing 22.3. 
+Its formatting is determined by the format template »FormatVorlage1«.
+
+----
+<w:p>
+    <w:pPr>
+        <w:pStyle w:val="FormatVorlage1"/>
+    </w:pPr>
+    <w:r>
+        <w:t>Text formatiert mit der Formatvorlage &gt;&gt;FormatVorlage 1&gt;&gt;.</w:t>
+    </w:r>
+</w:p>
+----
+
+Because the definitions of the styles are managed in another file, the next stop is the `_rels` subfolder of the current folder `word`. 
+In this example, this contains a single `.rels` file: `document.rels.xml`, the content of which is shown in Listing 22.4. 
+As the name suggests, we are dealing with the relationships of the document part.
+
+TIP: Under certain circumstances there may be several `.rels` files in the `_rels` folders of the lower hierarchy levels. 
+The `.rels` file for an XML file always has the same name as the file in which the relationships exist, as well as the `.rels.xml` file extension. 
+The top level of the Open XML file has no name, which is why the file is simply called `.rels`.
+
+.Listing 22.4 The relationships in `document.xml.rels`
+----
+<?xml version="1.0" encoding="UTF-8" standalone="true"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Target="webSettings.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings"
+        Id="rId3"/>
+    <Relationship Target="settings.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings"
+        Id="rId2"/>
+    <Relationship Target="styles.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"
+        Id="rId1"/>
+    <Relationship Target="theme/theme1.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme"
+        Id="rId5"/>
+    <Relationship Target="fontTable.xml"
+        Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable"
+        Id="rId4"/>
+</Relationships>
+----
+
+The Word application knows that it has to look for styles in a http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles file. 
+It cannot rely on a specific name, as explained in the section "Parts and their Names". 
+Here too, the Target attribute supplies the URI for the file with the desired information, in this case `styles.xml`. 
+Since the `styles.xml` file is in the same folder as the `document.xml` file, the URI does not require folder information. 
+URIs are relative paths.
+
+An excerpt from the `styles.xml` file is shown in Listing 22.5. 
+To find the definition of the formatting of the second paragraph, we needed the value of the `w:val` attribute in the `w:pStyle` element of the `document.xml` file (Listing 22.3):Formatvorlage1.
+After this, the `w:styleId` attribute of part style elements searched. 
+The sub-elements describe the individual formatting properties of the style.
+
+.Listing 22.5: The content of the `styles.xml` file
+----
+    <w:style w:styleId="Standard" w:default="1" w:type="paragraph">
+        <w:name w:val="Normal"/>
+        <w:qFormat/>
+        <w:rPr>
+            <w:lang w:val="de-CH"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:styleId="Absatz-Standardschriftart" w:default="1" w:type="character">
+        <w:name w:val="Default Paragraph Font"/>
+        <w:uiPriority w:val="1"/>
+        <w:semiHidden/>
+        <w:unhideWhenUsed/>
+    </w:style>
+    <w:style w:styleId="FormatVorlage1" w:type="paragraph" w:customStyle="1">
+        <w:name w:val="FormatVorlage 1"/>
+        <w:basedOn w:val="Standard"/>
+        <w:rPr>
+            <w:rFonts w:hAnsi="Times New Roman" w:ascii="Times New Roman"/>
+            <w:b/>
+            <w:caps/>
+            <w:color w:val="AEAAAA" w:themeShade="BF" w:themeColor="background2"/>
+            <w:sz w:val="18"/>
+        </w:rPr>
+    </w:style>
+</w:styles>
+----
+
+Figure 22.5 illustrates how relationships work. 
+They make it possible to address the parts of the ZIP package directly, instead of having to search through the individual nodes of the hierarchy.
+
+image::22.5 Find parts of the ZIP package using relationships (rels)
+
 === Documentation about relationship types
+
+As for the content types, the information for the different relationship types is listed in several places in the documentation. 
+The most basic types of relationships are in Part 1 (Fundamentals and Markup Language Reference) of the ISO/IEC 29500:2008 standard documents. 
+Extended relationship types are also available in "[MS-OI29500]: Office Implementation Information for ISO/IEC 29500 Standard Compliance".
+
+ONLINE: We have summarized information from these sources in the Excel workbook `OpenXML_Types.xlsx`, which is available in the download archive for the book in the `\Supplements\Kap22` folder.
 
 === Implicit and explicit relationships
 
+So far we have only dealt with relationships that are unique: In a Word document, only one main document part (`document.xml`) and one part for the definitions of the styles (`styles.xml`) may appear. 
+Consequently, it can be in the `.rels` files for these parts give only one entry for the corresponding relationship type.
+
+However, there are other types of relationships that can occur multiple times, such as for headers and footers. 
+As you know, a Word document can have up to three different headers and footers for each section if the options for a first page and for different even and odd pages are activated. 
+Each has its own XML file in a ZIP package, as shown in Figure 22.6.
+
+image: 22.6 A Word Open XML document with headers
+
+ONLINE: The sample file `Bsp22_02.docx` is located in the download archive for the book in the `\Examples\Kap22` folder
+
+As is known, headers and footers are defined in the section changes. 
+Consequently, they are in `document.xml` under the element that defines the section properties: `w:sectPr`, as `w:headerReference` or `w:footerReference` elements (Figure 22.7).
+
+image 22.7: The `document.xml` file with headers for the first and normal pages.
+
+The attribute `r:id` therefore indicates which identity relationship points to the corresponding part in the ZIP package. 
+So we can look up the corresponding part.
+
+Relationships between `document.xml` are managed in `word/_rels/document.xml.rels`, the content of which is shown in Listing 22.6 for this example. 
+There you can see that the definition for the header of the first page is in `header2.xml` (Id = rId7), while `header1.xml` (Id = rId6) is responsible for the content of the remaining pages.
+
+.Listing 22.6 Contents of the `document.xml.rels` file for the header example
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable"
+        Target="fontTable.xml"/>
+    <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/webSettings"
+        Target="webSettings.xml"/>
+    <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+        Target="header2.xml"/>
+    <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings"
+        Target="settings.xml"/>
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"
+        Target="styles.xml"/>
+    <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header"
+        Target="header1.xml"/>
+    <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes"
+        Target="endnotes.xml"/>
+    <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes"
+        Target="footnotes.xml"/>
+    <Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme"
+        Target="theme/theme1.xml"/>
+</Relationships>
+----
+
+If an `ID` value is required to determine the uniqueness of a part, we speak of an explicit relationship. 
+If the relationship is unique based on the relationship type, because only a part of this type is allowed, we are dealing with an implicit relationship.
+
+IMPORTANT: This concept is important for the technical handling of Open XML files, regardless of whether you are working with the Open XML SDK or another tool.
+
+NOTE: The ISO/IEC 29500:2008 standard documents contain information on the number of parts that are permitted in a ZIP package.
+
 === Internal and external relationships
+
+Most relationships in an Open XML package point to targets within the document, as in the examples listed.
+
+Destinations outside the file are also possible, such as linked mail merge data sources, subdocuments of a Word master document, images or Excel workbooks. 
+In these cases, these are external relationships.
 
 === Allowed relationships
 
+There are parts that must be present in a particular Word document, such as `document.xml`. 
+Without this part, the document would have no content; Word couldn't open it. 
+Other parts are optional: a document can contain headers and footers, but does not have to.
+
+Relationships always occur in pairs. 
+A source refers to a target part. 
+Most of the time, the relationship is one-way. 
+An image, for example, cannot serve as the target type of a relationship for the document; only the other way round is possible. 
+Many parts, like those that describe formatting, can only serve as targets and not as sources.
+
+There is a relationship type for each combination of parts. 
+We are talking about required, allowed and illicit relationship types.
+
+The Office Open XML standard defines the permitted relationship types for the individual applications.
+
 === New terminology
 
+Table 22.2 summarizes and briefly explains the terms presented in this section.
+
+Table 22.2: New terminology of the section »Relationships between the parts: rels«
+[%header, cols=3*]
+|====
+|German Term
+|English Term
+|Short Description
+
+|Beziehungen
+|Relationships
+|Describe the relationships between the parts of a ZIP package
+
+|Beziehungstyp
+|relationship type
+|A URI that clearly describes the relationship type. 
+
+|Ziel
+|target
+|The part of the ZIP package that corresponds to the specified relationship type
+
+|Quelle
+|source
+|The part of the ZIP package that contains relationships to other parts with additional content
+
+|.rels-Datei
+|.rels file
+|Manages a source's relationships and lists the relationship types for the source with their goals
+
+|Explizite Beziehung
+|explicit relationship
+|This is the case if several target files of the same relationship type are allowed in the ZIP package
+
+|Implizite Beziehung
+|implicit relationship
+|This is the case if only one target file can exist in the ZIP package for a relationship type
+
+|Interne Beziehung
+|internal relationship
+|Source and target parts are in the same Open XML file
+
+|Externe Beziehung
+|external relationship
+|The target part is in another file
+
+|====
+
 == Practical application: replace a part
+
+Although the insight into the interior of an office document can be interesting, it does not help the developer: he must be able to do something with this information. 
+In this section we present a small example of the possibilities that Open XML offers developers. 
+Without code and without starting the Word application, the appearance of the document from Figure 22.8 is converted into the document shown in Figure 22.9.
+
+image::22.8 The document template in the old corporate identity
+
+image::22.9 The new logo and the changed font formatting in the new corporate identity
+
+ONLINE: The sample files `Bsp22_03.dotx` and `Bsp22_04.dotx` can be found in the download archive for the book in the `\Examples\Kap22` folder
+
+Almost everyone who works in the same company for a long time has seen a change in corporate identity. 
+For example, the logo as well as the fonts and possibly also the colors that can be used in documents are changed.
+
+This process is partly taken into account with the »designs« functionality. 
+However, it often happens that the document templates for letterheads and other document types have to be dapted. This work can be extremely tedious, even if macros are used to support it.
 
 === Programming environments for working with Office Open XML
 
